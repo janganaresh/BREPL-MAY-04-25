@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Dashboard{% endblock %}</title>
+    
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    <style>
+        /* General Reset */
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+  
+        body {
+          font-family: Arial, sans-serif;
+          display: flex;
+          flex-direction: column;
+          min-height: 100vh;
+        }
+        .copyright{
+          color: #007bff;
+          text-align: center;
+        }
+        /* Header */
+        .header {
+          background-color: #2eba41;
+          color: white;
+          padding: 10px 20px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          position: relative;
+          z-index: 1001;
+        }
+  
+        .burger-button {
+          font-size: 24px;
+          background: none;
+          border: none;
+          color: white;
+          cursor: pointer;
+        }
+  
+        /* Sidebar */
+        .sidebar {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 300px;
+          height: 100%;
+          background-color: #2c3e50;
+          overflow-y: auto;
+          transition: transform 0.3s ease;
+          box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+          z-index: 1000;
+        }
+  
+        .sidebar.closed {
+          transform: translateX(-100%);
+        }
+  
+        .sidebar-header {
+          background-color: #34495e;
+          color: white;
+          padding: 10px 20px;
+          display: flex;
+          justify-content: flex-end;
+          align-items: center;
+        }
+  
+        .close-button {
+          font-size: 24px;
+          background: none;
+          border: none;
+          color: white;
+          cursor: pointer;
+        }
+  
+        .menu {
+          list-style: none;
+          padding: 0;
+        }
+  
+        .menu-item {
+          padding: 10px 20px;
+          cursor: pointer;
+          position: relative;
+          color: white;
+          background-color: #2c3e50;
+        }
+  
+        .menu-item:hover {
+          background-color: #000000;
+        }
+  
+        .menu-item .arrow {
+          float: right;
+          transition: transform 0.3s;
+        }
+  
+        .menu-item.open .arrow {
+          transform: rotate(90deg);
+        }
+  
+        .submenu {
+          display: none;
+          list-style: none;
+          padding-left: 20px;
+          background-color: #34495e;
+         
+        }
+  
+        .submenu li {
+          padding: 5px 20px;
+          color: #ecf0f1;
+        }
+  
+        .submenu li:hover {
+          background-color: #000000;
+        }
+  
+        .menu-item.open .submenu {
+          display: block;
+        }
+  
+        /* Main Content */
+        .content {
+          align-items: center;
+          margin-left: 250px;
+          padding: 20px;
+          transition: margin-left 0.3s ease;
+        }
+  
+        .sidebar.closed + .content {
+          margin-left: 0;
+        }
+  
+        /* Dashboard Heading */
+        .dashboard-heading {
+          text-align: center;
+          margin-bottom: 20px;
+          font-size: 2rem;
+          color: #2c3e50;
+          font-weight: bold;
+        }
+  
+        .task-dashboard {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 20px;
+          padding: 20px;
+          width: 90%;
+          max-width: 1200px;
+          margin: 0 auto;
+          background-color: #ffffff;
+          border-radius: 10px;
+        }
+  
+        .reports {
+          grid-column: span 2; 
+        }
+  
+        .container {
+          background-color: #ffffff;
+          border: 1px solid #ddd;
+          border-radius: 8px;
+          padding: 20px;
+          text-align: center;
+          box-shadow: 0 6px 12px rgba(9, 9, 9, 0.1);
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+          width: 100%; 
+          margin: 0 auto; 
+        }
+        .container-ass {
+          display: none;
+          background-color: #ffffff;
+          border: 1px solid #ddd;
+          border-radius: 8px;
+          padding: 20px;
+          text-align: center;
+          box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+  
+        .container:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 10px 20px rgba(103, 229, 6, 0.15);
+        }
+  
+        .container h2 {
+          margin-top: 0;
+          font-size: 1.6rem;
+          color: #333;
+  
+          display: inline-block;
+          padding-bottom: 5px;
+        }
+        .dashboard-heading {
+          color: #000000;
+          text-align: center;
+          font-size: 2rem; 
+          margin-bottom: 20px; 
+        }
+        .tabs {
+          display: flex;
+          justify-content: center;
+          margin-bottom: 15px;
+          gap: 10px;
+        }
+        .no {
+          background-color: #ddd;
+        }
+        .tabs button {
+          background-color: #007bff;
+          color: white;
+          border: none;
+          border-radius: 20px;
+          padding: 6px 12px;
+          font-size: 0.9rem;
+          cursor: pointer;
+          transition: background-color 0.3s ease;
+          text-decoration: none;
+        }
+  
+        .tabs button:hover {
+          background-color: #0056b3;
+        }
+  
+        .calendar input[type="date"] {
+          width: 80%;
+          padding: 10px;
+          border: 1px solid #ddd;
+          border-radius: 5px;
+          font-size: 1rem;
+          margin-top: 10px;
+        }
+  
+        ul {
+          list-style: none;
+          padding: 0;
+        }
+  
+        ul li {
+          margin: 10px 0;
+          font-size: 1.1rem;
+        }
+  
+        ul li input[type="checkbox"] {
+          margin-right: 10px;
+        }
+  
+        .charts {
+          display: flex;
+          justify-content: space-around;
+          align-items: center;
+        }
+  
+        .bar-chart,
+        .pie-chart {
+          width: 45%;
+          height: 300px;
+          background-color: #eaeaea;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          border-radius: 5px;
+        }
+        .comment-icon {
+      font-size: 24px; 
+      color: blue;
+      position: absolute; 
+      bottom: 10px; 
+      right: 10px; 
+      cursor: pointer;
+  }
+  .calendar-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;  
+      justify-content: center; 
+      width: 100%;  
+      height: 100%; 
+      gap: 10px; 
+      
+  }
+  .welcome-text {
+      font-size: 1.4em; /* Same as H2 */
+  }
+        /* Responsiveness */
+        @media (max-width: 768px) {
+          .welcome-text {
+          font-size: 1.2em; /* Same as H3 */
+      }
+          .sidebar {
+            transform: translateX(-100%);
+            width: 250px;
+          }
+          .container {
+            max-width: 100%; 
+            padding: 12px; 
+          }
+          .sidebar.open {
+            transform: translateX(0);
+          }
+  
+          .content {
+            margin-left: 0;
+          }
+          .task-dashboard {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 20px;
+          padding: 0px;
+          width:100%;
+          max-width: 1200px;
+          margin: 0 auto;
+          background-color: #ffffff;
+          border-radius: 10px;
+          grid-template-columns: 1fr;
+        }
+          
+          .reports {
+            grid-column: span 1;
+          }
+          .form-group-ass {
+            display: block; /* Show the 2nd container on smaller screens */
+          }
+  
+          .form-group-ass {
+            display: block; /* Show the 2nd container on smaller screens */
+            width: 100%;
+            padding: 15px;
+            background: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+          }
+  
+          .form-group-ass label {
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: #333;
+            width: 100%;
+          }
+  
+          .form-group-ass input[type="date"] {
+            width: 100%;
+            padding: 12px;
+            margin-top: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            background-color: #f9f9f9;
+            transition: border-color 0.3s ease;
+          }
+  
+          .form-group-ass input[type="date"]:focus {
+            border-color: #007bff;
+            outline: none;
+          }
+          .charts {
+      flex-direction: column;
+      align-items: center; 
+    }
+    .bar-chart, .pie-chart {
+      width: 100%; /* Full width for mobile */
+      margin-bottom: 20px; /* Add space between charts */
+    }
+        }
+  
+        @media screen and (min-width: 769px) {
+          .task-calendar {
+            display: block; /* Show the 1st container on larger screens */
+          }
+        }
+      </style>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <span class="welcome-message">
+            <h2 class="welcome-text">😊 Welcome, {{ username }}! 🌟</h2>
+        </span>
+        <button id="burger-button" class="burger-button">&#9776;</button>
+    </header>
+
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <button id="close-button" class="close-button">&times;</button>
+        </div>
+        <ul class="menu">
+            {% if user_type == 'Admin' %}
+            <li class="menu-item open">
+                Masters <span class="arrow">&#9654;</span>
+                <ul class="submenu">
+                    <li class="menu-item">
+                        Customer
+                        <span class="icons">
+                            <button class="create-btn" onclick="window.location.href='/customer'" title="Create">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                            <button class="update-btn" onclick="window.location.href='/updatecustomer'" title="Update">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </span>
+                    </li>
+                    <li class="menu-item">
+                        Site
+                        <span class="icons">
+                            <button class="create-btn" onclick="window.location.href='/site'" title="Create">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                            <button class="update-btn" onclick="window.location.href='/updatesite'" title="Update">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </span>
+                    </li>
+                    <li class="menu-item">
+                        Users
+                        <span class="icons">
+                            <button class="create-btn" onclick="window.location.href='/userform'" title="Create">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                            <button class="update-btn" onclick="window.location.href='/updateusers'" title="Update">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </span>
+                    </li>
+                </ul>
+            </li>
+            {% endif %}
+
+            <li class="menu-item">
+                Assessment
+                <span class="icons">
+                    <button class="create-btn" onclick="window.location.href='/assessment'" title="Create">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <button class="update-btn" onclick="window.location.href='/updateassmnt'" title="Update">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                </span>
+            </li>
+
+            <li class="menu-item">
+                Remedy
+                <span class="icons">
+                    <button class="create-btn" onclick="window.location.href='/remedy'" title="Create">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <button class="update-btn" onclick="window.location.href='/updateremedy'" title="Update">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                </span>
+            </li>
+
+            <li class="menu-item">
+                Inventory <span class="arrow">&#9654;</span>
+                <ul class="submenu">
+                    <li class="menu-item">
+                        Inventory
+                        <span class="icons">
+                            <button class="create-btn" onclick="window.location.href='/inventory'" title="Create">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                            <button class="update-btn" onclick="window.location.href='/updateinventory'" title="Update">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </span>
+                    </li>
+                    <li class="menu-item">
+                        Inventory Trans
+                        <span class="icons">
+                            <button class="create-btn" onclick="window.location.href='/invtrans'" title="Create">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                            <button class="update-btn" onclick="window.location.href='/updateinvtrans'" title="Update">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </span>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="menu-item">
+                Reports <span class="arrow">&#9654;</span>
+                <ul class="submenu">
+                    <li class="menu-item" onclick="window.location.href='/reports'">
+                        Assessment 
+                        <i class="fas fa-chart-bar"></i>
+                    </li>
+                    <li class="menu-item" onclick="window.location.href='/remedyreports'">
+                        Remedy 
+                        <i class="fas fa-chart-line"></i>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="menu-item" onclick="window.location.href='/profile'">
+                Profile <i class="fas fa-user"></i>
+            </li>
+
+            <li class="menu-item" onclick="window.location.href='/'">
+                Logout <i class="fas fa-sign-out-alt"></i>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content (Dynamic Section) -->
+    <main class="content" id="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <script>
+
+
+function toggleSubMenu() {
+        const submenu = document.querySelector('.submenu');
+        const arrow = document.querySelector('.arrow');
+
+        submenu.classList.toggle('hidden');
+        arrow.classList.toggle('rotate');
+    }
+      document.addEventListener("DOMContentLoaded", () => {
+        const burgerButton = document.getElementById("burger-button");
+        const closeButton = document.getElementById("close-button");
+        const sidebar = document.getElementById("sidebar");
+
+        burgerButton.addEventListener("click", () => {
+          sidebar.classList.toggle("open");
+          sidebar.classList.toggle("closed");
+        });
+
+        closeButton.addEventListener("click", () => {
+          sidebar.classList.add("closed");
+          sidebar.classList.remove("open");
+        });
+
+        document.querySelectorAll(".menu-item").forEach((item) => {
+          item.addEventListener("click", () => {
+            item.classList.toggle("open");
+          });
+        });
+      });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const setupCalendar = (calendarId, dateInputId) => {
+          const calendar = flatpickr(calendarId, {
+            inline: true,
+            onChange: (selectedDates, dateStr) => {
+              document.getElementById(dateInputId).value = dateStr;
+            },
+          });
+        };
+
+        // Initialize calendars for both containers
+        setupCalendar("#assessment-calendar", "assessment-date");
+        setupCalendar("#remedy-calendar", "remedy-date");
+      });
+      // Bar chart for Assessment
+      const ctxBar = document.getElementById("barChart").getContext("2d");
+      const barChart = new Chart(ctxBar, {
+        type: "bar",
+        data: {
+          labels: ["January", "February", "March", "April", "May"],
+          datasets: [
+            {
+              label: "Assessment Data",
+              data: [12, 19, 3, 5, 2],
+              backgroundColor: "rgba(54, 162, 235, 0.2)",
+              borderColor: "rgba(54, 162, 235, 1)",
+              borderWidth: 1,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+            },
+          },
+        },
+      });
+
+      // Pie chart for Assessment
+      const ctxPie = document.getElementById("pieChart").getContext("2d");
+      const pieChart = new Chart(ctxPie, {
+        type: "pie",
+        data: {
+          labels: ["Red", "Orange", "Yellow"],
+          datasets: [
+            {
+              data: [300, 50, 100],
+              backgroundColor: ["red", "orange", "yellow"],
+              hoverOffset: 4,
+            },
+          ],
+        },
+      });
+
+      // Bar chart for Remedy
+      const ctxBarRemedy = document
+        .getElementById("barChartRemedy")
+        .getContext("2d");
+      const barChartRemedy = new Chart(ctxBarRemedy, {
+        type: "bar",
+        data: {
+          labels: ["Week 1", "Week 2", "Week 3", "Week 4"],
+          datasets: [
+            {
+              label: "Remedy Data",
+              data: [10, 15, 7, 3],
+              backgroundColor: "rgba(255, 99, 132, 0.2)",
+              borderColor: "rgba(255, 99, 132, 1)",
+              borderWidth: 1,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+            },
+          },
+        },
+      });
+
+      // Pie chart for Remedy
+      const ctxPieRemedy = document
+        .getElementById("pieChartRemedy")
+        .getContext("2d");
+      const pieChartRemedy = new Chart(ctxPieRemedy, {
+        type: "pie",
+        data: {
+          labels: ["Red", "Orange", "Yellow"],
+          datasets: [
+            {
+              data: [80, 100, 50],
+              backgroundColor: ["red", "orange", "yellow"],
+              hoverOffset: 4,
+            },
+          ],
+        },
+      });
+      function loadPage(page) {
+            fetch(`/load_page/${page}`)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById("main-content").innerHTML = html;  // ✅ Only change main content
+                    history.pushState(null, "", page); // ✅ Update URL without reload
+                })
+                .catch(error => console.error("Error loading page:", error));
+        }
+
+        // Load dashboard by default
+        window.onload = function() {
+            loadPage('dashboard');
+        };
+
+        // Handle browser back/forward navigation
+        window.onpopstate = function() {
+            const page = location.pathname.split("/").pop() || "dashboard";
+            loadPage(page);
+        };
+
+    </script>
+
+</body>
+</html>

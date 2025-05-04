@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <title>Table Form</title>
+    <style>
+        /* General Reset */
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+  
+        /* Body Style */
+        body {
+          font-family: Arial, sans-serif;
+          background-color: #f4f4f9;
+          color: #333;
+          min-height: 100vh;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          padding-top: 20px;
+        }
+  
+        /* Heading */
+        h1 {
+          text-align: center;
+          color: #4caf50;
+          margin-bottom: 20px;
+          font-size: 1.8rem;
+        }
+  
+        /* Form */
+        form {
+          background-color: #fff;
+          border-radius: 8px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+          width: 100%;
+          max-width: 600px;
+          padding: 20px;
+        }
+  
+        /* Form Group */
+        .form-group {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: space-between;
+          margin-bottom: 15px;
+        }
+  
+        label {
+          font-size: 16px;
+          font-weight: 600;
+          color: #555;
+          margin-bottom: 5px;
+          flex: 1;
+          min-width: 150px;
+        }
+  
+        input[type="text"],
+        input[type="date"] {
+          padding: 10px;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          font-size: 16px;
+          color: #555;
+          flex: 2;
+        }
+  
+        input[type="text"]:focus,
+        input[type="date"]:focus {
+          border-color: #4caf50;
+          outline: none;
+        }
+  
+        /* Required Fields */
+        .required {
+          color: red;
+          font-weight: bold;
+        }
+  
+        /* Buttons (Submit and Cancel) */
+        .form-buttons {
+          display: flex;
+          justify-content: space-between;
+          gap: 10px;
+        }
+  
+        input[type="submit"],
+        .cancel-btn {
+          width: 48%;
+          padding: 12px;
+          border-radius: 4px;
+          font-size: 16px;
+          cursor: pointer;
+          transition: background-color 0.3s;
+          text-align: center;
+        }
+  
+        input[type="submit"] {
+          background-color: #4caf50;
+          color: white;
+          border: none;
+        }
+  
+        input[type="submit"]:hover {
+          background-color: #45a049;
+        }
+  
+        .cancel-btn {
+          background-color: #f44336;
+          color: white;
+          border: none;
+        }
+  
+        .cancel-btn:hover {
+          background-color: #e53935;
+        }
+        /* Popup Message Style */
+        .popup {
+          display: none;
+          padding: 20px;
+          font-size: 16px;
+          border-radius: 8px;
+          text-align: center;
+          width: 100%;
+          max-width: 400px;
+          position: fixed;
+          top: 20px;
+          left: 50%;
+          transform: translateX(-50%);
+          z-index: 1000;
+        }
+  
+        /* Green Popup for Success */
+        .popup.success {
+          background-color: #4caf50;
+          color: white;
+        }
+  
+        /* Red Popup for Failure */
+        .popup.failure {
+          background-color: #f44336;
+          color: white;
+        }
+        select {
+          padding: 10px;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          font-size: 16px;
+          color: #555;
+          flex: 2;
+        }
+  
+        select:focus {
+          border-color: #4caf50;
+          outline: none;
+        }
+  
+      .image-map-btn-custom {
+      display: inline-block;
+      padding: 8px 12px;
+      background-color: #311f1f;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.3s ease;
+      margin-right: 40px;
+      
+  }
+  
+  .image-map-btn-custom:hover {
+      background-color: #0d0e0e;
+  }
+  
+  /* Initially hide the image map container */
+  .image-map-container {
+      display: none;
+      margin-top: 5px;
+      margin-bottom: 15px;
+      width: 100%;
+      max-width: 700px; /* Adjust as needed */
+      height: 500px;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      overflow: hidden;
+  }
+  
+  .image-map-container iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      overflow: auto;
+      
+  }
+  .pile-container {
+    text-align: center;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      border-width: 10px;
+      border-radius: 3px;
+      border-color: #080808;
+  }
+  
+  .pile-tag {
+      background-color: #007bff;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+  }
+  
+  .remove-x {
+      margin-left: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      color: rgb(0, 0, 0);
+  }
+  
+  .remove-x:hover {
+      color: #d61111;
+  }
+  
+  
+        /* Responsive Behavior */
+        @media (max-width: 768px) {
+          .form-group {
+            flex-direction: column;
+          }
+  
+          label {
+            margin-bottom: 5px;
+          }
+  
+          input[type="text"],
+          input[type="date"] {
+            width: 100%;
+          }
+          .form-buttons {
+            flex-direction: column;
+            gap: 10px;
+          }
+  
+          input[type="submit"],
+          .cancel-btn {
+            width: 100%;
+          }
+        }
+  
+        /* Centered Note */
+        .note {
+          text-align: center;
+          color: red;
+          font-size: 14px;
+          margin-top: 10px;
+        }
+        .selected-hotspot {
+      background-color: rgb(161, 234, 27) !important;
+      border: 2px solid black;
+      opacity: 0.8;
+  }
+  
+      </style>
+</head>
+<body>
+    <h1>Create Table</h1>
+    <form  id="tableForm" action="/submit_table_form" method="POST">
+        
+
+        <div class="form-group">
+            <label for="area_id">Select Area <span class="required">*</span></label>
+            <select id="area_id" name="area_id" required>
+              <option value="" disabled selected>Select Area</option>
+              <!-- Options will be populated dynamically -->
+            </select>
+          </div>
+     
+        <div class="form-group">
+            <label for="table_id">Select Table <span class="required">*</span></label>
+            <input type="hidden" id="table_id" name="table_id"> 
+            <button type="button" class="image-map-btn-custom" onclick="openImageMap()">Open Image Map</button>
+            <button type="button" class="image-map-btn-custom" id="select_all_btn" onclick="toggleAllPiles()">Select All Piles</button>  
+        </div>
+        <div id="pileContainer" class="pile-container"></div> <!-- Display selected hotspots -->
+  
+        <!-- Hidden container for the image map -->
+        <div id="imageMapContainer" class="image-map-container">
+            <iframe src="/A002hotspot" id="imageMapFrame"></iframe>
+        </div>
+        
+
+        <div class="form-group">
+            <label for="location">Location</label>
+            <input type="text" id="location" name="location" placeholder="Enter Location">
+        </div>
+
+        <!--<div class="form-group">
+            <label for="gps">GPS</label>
+            <input type="text" id="gps" name="gps" placeholder="Enter GPS Coordinates">
+        </div>-->
+
+        <div class="form-buttons">
+            <button type="button" class="cancel-btn" onclick="window.location.href='/dashboard'">Cancel</button>
+            <input type="submit" value="Submit">
+          
+        </div>
+        
+        
+        <p class="note"><span class="required">*</span> Required </p>
+    </form>
+        <!-- Popup message for success or failure and add 3 css also -->
+        <div id="popupMessage" class="popup"></div>
+
+        <script>
+            let selectedPiles = []; // Array to store selected hotspots
+
+function openImageMap() {
+    let container = document.getElementById("imageMapContainer");
+    let button = document.querySelector(".image-map-btn-custom"); // Select the button
+
+    if (container.style.display === "none" || container.style.display === "") {
+        container.style.display = "block"; // Show Image Map
+        button.textContent = "Close Image Map"; // Change button text
+    } else {
+        container.style.display = "none"; // Hide Image Map
+        button.textContent = "Open Image Map"; // Change button text back
+    }
+}
+
+function togglePileValue(value) {
+    let pileIndex = selectedPiles.indexOf(value);
+
+    if (pileIndex === -1) {
+        // If not in the list, add it
+        selectedPiles.push(value);
+    } else {
+        // If already in the list, remove it
+        selectedPiles.splice(pileIndex, 1);
+    }
+
+    updatePileDisplay(); // Refresh UI
+}
+
+function updatePileDisplay() {
+    let pileContainer = document.getElementById("pileContainer");
+    pileContainer.innerHTML = ""; // Clear previous content
+
+    selectedPiles.forEach((pile, index) => {
+        let tag = document.createElement("span");
+        tag.classList.add("pile-tag");
+        tag.innerHTML = `${pile} <span class="remove-x" onclick="removePile(${index})">×</span>`;
+        pileContainer.appendChild(tag);
+    });
+
+    document.getElementById("table_id").value = selectedPiles.join(", "); // Update hidden field
+}
+
+function removePile(index) {
+    let removedPile = selectedPiles[index]; // Get removed pile name
+    selectedPiles.splice(index, 1); // Remove from list
+
+    // Remove highlight from the hotspot in iframe
+    let iframe = document.getElementById("imageMapFrame").contentWindow;
+    let hotspotElement = iframe.document.querySelector(`[data-name="${removedPile}"]`);
+    
+    if (hotspotElement) {
+        hotspotElement.classList.remove("selected-hotspot");
+    }
+
+    updatePileDisplay(); // Refresh UI
+}
+
+function toggleAllPiles() {
+    let selectAllButton = document.getElementById("select_all_btn");
+    let iframe = document.getElementById("imageMapFrame").contentWindow;
+    let hotspots = iframe.document.querySelectorAll("[data-name]");
+
+    selectedPiles = []; // Reset the array
+
+    if (selectAllButton.textContent === "Select All Piles") {
+        hotspots.forEach(hotspot => {
+            let pileName = hotspot.getAttribute("data-name");
+            if (!selectedPiles.includes(pileName)) {
+                selectedPiles.push(pileName);
+                hotspot.classList.add("selected-hotspot"); // Highlight selection
+            }
+        });
+        selectAllButton.textContent = "Deselect All Piles";
+    } else {
+        hotspots.forEach(hotspot => {
+            hotspot.classList.remove("selected-hotspot");
+        });
+        selectAllButton.textContent = "Select All Piles";
+    }
+    updatePileDisplay();
+}
+            // Handling form submission
+            document.getElementById('tableForm').addEventListener('submit', function(event) {
+                event.preventDefault(); // Prevent default form submission
+    
+                // Create a FormData object to send the form data via fetch
+                var formData = new FormData(this);
+    
+                // Fetch request to submit form data
+                fetch('/submit_table_form', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    var popupMessage = document.getElementById('popupMessage');
+    
+                    // Dynamically display server message
+                    popupMessage.textContent = data.message || 'Error submitting the form. Please try again.';
+    
+                    if (data.success) {
+                        // Display success popup and redirect
+                        popupMessage.classList.remove('failure');
+                        popupMessage.classList.add('success');
+    
+                        // Redirect after 3 seconds
+                        setTimeout(function() {
+                            window.location.href = 'dashboard';
+                        }, 3000);
+                    } else {
+                        // Display failure popup and stay on the page
+                        popupMessage.classList.remove('success');
+                        popupMessage.classList.add('failure');
+                    }
+    
+                    // Show popup message
+                    popupMessage.style.display = 'block';
+    
+                    // Hide popup after 3 seconds
+                    setTimeout(function() {
+                        popupMessage.style.display = 'none';
+                    }, 3000);
+                })
+                .catch(error => {
+                    var popupMessage = document.getElementById('popupMessage');
+                    popupMessage.classList.remove('success');
+                    popupMessage.classList.add('failure');
+                    popupMessage.textContent = 'There was an error submitting the form. Please try again.';
+                    popupMessage.style.display = 'block';
+    
+                    // Hide popup after 3 seconds
+                    setTimeout(function() {
+                        popupMessage.style.display = 'none';
+                    }, 2000);
+                });
+            });
+
+            fetch("/get_area_ids")
+        .then((response) => response.json())
+        .then((data) => {
+          const areaSelect = document.getElementById("area_id"); // Ensure the dropdown has this ID in your HTML
+          data.areas.forEach((area) => {
+            const option = document.createElement("option");
+            option.value = area.id; // Use Area ID as the value
+            option.textContent = area.location; // Display Location
+            areaSelect.appendChild(option);
+          });
+        })
+        .catch((error) => console.error("Error fetching areas:", error));
+
+         fetch("/get_row_ids")
+    .then(response => response.json())
+    .then(data => {
+        const rowSelect = document.getElementById("row_id"); // Ensure the dropdown has this ID in your HTML
+        data.rows.forEach(row => {
+            const option = document.createElement("option");
+            option.value = row.id; // Use Row ID as the value
+            option.textContent = row.name; // Display Row Name
+            rowSelect.appendChild(option);
+        });
+    })
+    .catch(error => console.error("Error fetching rows:", error));
+        </script>
+</body>
+</html>

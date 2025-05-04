@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar Plant Hotspots</title>
+    <style>
+        body { text-align: center; font-family: Arial, sans-serif; }
+        .container {
+    position: relative;
+    display: inline-block;
+    transform: scale(0.6); /* Adjust scale factor as needed */
+    transform-origin: top left; /* Ensure scaling does not distort alignment */
+}
+
+        .hotspot {
+            position: absolute;
+            border: 1px solid rgb(255, 255, 255);
+            background: rgba(84, 148, 226, 0.1);
+            cursor: pointer;
+            width: 28px;
+            height: 10px;
+        }
+        .hotspot:hover {
+            background: rgba(0, 59, 237, 0.3);
+        }
+        .tooltip {
+    position: absolute;
+    background: black;
+    color: white;
+    padding: 5px 10px;
+    font-size: 14px;
+    border-radius: 5px;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 1; 
+}
+.selected-hotspot {
+        
+        border: 2px solid rgb(0, 29, 248);
+       
+    }
+    </style>
+</head>
+<body>
+    <h2>Area-3</h2>
+    <h3>Click a hotspot to Select it & double click to Deselect</h3>
+    <div class="container">
+        <img src="{{ url_for('static', filename='images/area3.jpg') }}" id="plant-map" width="1700px" height="800px"> 
+        <div id="tooltip" class="tooltip"></div>
+    </div>
+    <p id="output"></p>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let container = document.querySelector(".container");
+            let tooltip = document.getElementById("tooltip");
+
+            // Offsets to fine-tune the grid position
+            let leftOffset = 33;  // Adjust for horizontal alignment
+            let topOffset = 38;   // Adjust for vertical alignment
+
+            let cols = 25; // Total columns
+            let rows = 23; // Total rows
+
+            let rectWidth = 62;
+            let rectHeight = 17;
+            let gapHorizontal = 1.4;
+            let gapVertical = 15.9;
+
+            let excludedRanges = [
+                { row: 1, startCol: 13, endCol: 16},
+                { row: 2, startCol: 13, endCol: 16 },
+                { row:3, startCol:13, endCol: 16},
+                { row:4, startCol:13, endCol: 16},
+                { row:23, startCol:1, endCol: 9},
+                { row:23, startCol:11, endCol: 25},
+                { row:22, startCol:1, endCol: 6},
+                { row:22, startCol:11, endCol: 25},
+                { row:21, startCol:1, endCol: 4},
+                { row:21, startCol:11, endCol: 11},
+                { row:21, startCol:16, endCol: 25},
+                { row:20, startCol:1, endCol: 2},
+                { row:20, startCol:17, endCol: 25},
+                { row:19, startCol:19, endCol: 25},
+                { row:18, startCol:20, endCol: 25},
+                { row:17, startCol:22, endCol: 25},
+                { row:16, startCol:23, endCol:25},
+                { row:4, startCol:1, endCol: 1},
+                { row:5, startCol:1, endCol: 1},
+                { row:6, startCol:1, endCol: 2},
+                { row:7, startCol:2, endCol: 3},
+                { row:8, startCol:2, endCol: 3},
+                { row:9, startCol:3, endCol: 4},
+                { row:10, startCol:4, endCol:5},
+                { row:11, startCol:4, endCol: 5},
+                { row:12, startCol:5, endCol: 6},
+                { row:13, startCol:6, endCol: 6},
+                { row:14, startCol:6, endCol: 7},
+                { row:15, startCol:7, endCol:8},
+                { row:16, startCol:8, endCol: 8},
+                { row:17, startCol:8, endCol: 9},
+                { row:18, startCol:9, endCol: 9},
+                { row:19, startCol:10, endCol: 10},
+                { row:20, startCol:10, endCol: 10},
+                { row:15, startCol:25, endCol: 25},
+                { row:1, startCol:25, endCol:25},
+                { row:2, startCol:25, endCol:25},
+                { row:3, startCol:25, endCol:25},
+                { row:4, startCol:25, endCol:25},
+                { row:5, startCol:25, endCol:25},
+                { row:6, startCol:25, endCol:25},
+                { row:7, startCol:25, endCol:25},
+             ];
+
+            function isExcluded(r, c) {
+                return excludedRanges.some(range => r === range.row && c >= range.startCol && c <= range.endCol);
+            }
+
+
+            let hotspotMapping = {
+              // COLUMN 1
+                "r1c1": "C8S9",
+                "r2c1": "C8S10",
+                "r3c1": "C8S11",
+                "r7c1": "C8S12",
+                "r8c1": "C8S13",
+                "r9c1": "C8S14",
+                "r10c1": "C8S15",
+                "r11c1": "C8S16",
+                "r12c1": "C8S17",
+                "r13c1": "C8S18",
+                "r14c1": "C8S19",
+                "r15c1": "C8N9",
+                "r16c1": "C8N13",
+                "r17c1": "C8S20",
+                "r18c1": "C8S21",
+                "r19c1": "C8S22",
+
+                // COLUMN 2
+                "r1c2": "C9S9",
+                "r2c2": "C9S10",
+                "r3c2": "C9S11",
+                "r4c2": "C9S12",
+                "r5c2": "C9S13",
+                "r9c2": "C9S14",
+                "r10c2": "C9S15",
+                "r11c2": "C9S16",
+                "r12c2": "C9S17",
+                "r13c2": "C9S18",
+                "r14c2": "C9N5",
+                "r15c2": "C9N10",
+                "r16c2": "C919",
+                "r17c2": "C9S20",
+                "r18c2": "C9S21",
+                "r19c2": "C9S22",
+
+                // COLUMN 3
+                "r1c3": "C10S9",
+                "r2c3": "C10S10",
+                "r3c3": "C10S11",
+                "r4c3": "C10S12",
+                "r5c3": "C10S13",
+                "r6c3": "C10S14",
+                "r10c3": "C10S15",
+                "r11c3": "C10S16",
+                "r12c3": "C10S17",
+                "r13c3": "C10S18",
+                "r14c3": "C10N6",
+                "r15c3": "C10S19",
+                "r16c3": "C10S20",
+                "r17c3": "C10S21",
+                "r18c3": "C10S22",
+                "r19c3": "C10S23",
+                "r20c3": "C10S24 ",
+
+                 // COLUMN 4
+                 "r1c4": "C11S8",
+                "r2c4": "C11S9",
+                "r3c4": "C11S10",
+                "r4c4": "C11S11",
+                "r5c4": "C11S12",
+                "r6c4": "C11S13",
+                "r7c4": "C11S14",
+                "r8c4": "C11S15",
+                "r12c4": "C11S16",
+                "r13c4": "C11N3",
+                "r14c4": "C11N7",
+                "r15c4": "C11S17",
+                "r16c4": "C11S18",
+                "r17c4": "C11S19",
+                "r18c4": "C11S20",
+                "r19c4": "C11S21",
+                "r20c4": "C11S22",
+
+                 // COLUMN 5
+                 "r1c5": "C12S8",
+                "r2c5": "C12S9",
+                "r3c5": "C12S10",
+                "r4c5": "C12S11",
+                "r5c5": "C12S12",
+                "r6c5": "C12S13",
+                "r7c5": "C12S14",
+                "r8c5": "C12S15",
+                "r9c5": "C12S16",
+                "r13c5": "C12N4",
+                "r14c5": "C12S17",
+                "r15c5": "C12S18",
+                "r16c5": "C12S19",
+                "r17c5": "C12S20",
+                "r18c5": "C12S21",
+                "r19c5": "C12S22",
+                "r20c5": "C12S23",
+                "r21c5": "C12S24",
+
+                // COLUMN 6
+                 "r1c6": "C13S7",
+                "r2c6": "C13S8",
+                "r3c6": "C13S9",
+                "r4c6": "C13S10",
+                "r5c6": "C13S11",
+                "r6c6": "C13S12",
+                "r7c6": "C13S13",
+                "r8c6": "C13S14",
+                "r9c6": "C13S15",
+                "r10c6": "C13S16",
+                "r11c6": "C13S17",
+                "r15c6": "C13S18",
+                "r16c6": "C13S19",
+                "r17c6": "C13S20",
+                "r18c6": "C13S21",
+                "r19c6": "C13S22",
+                "r20c6": "C13S23",
+                "r21c6": "C13S24",
+
+                 // COLUMN 7
+                 "r1c7": "C14S7",
+                "r2c7": "C14S8",
+                "r3c7": "C14S9",
+                "r4c7": "C14S10",
+                "r5c7": "C14S11",
+                "r6c7": "C14S12",
+                "r7c7": "C14S13",
+                "r8c7": "C14S14",
+                "r9c7": "C14S15",
+                "r10c7": "C14S16",
+                "r11c7": "C14S17",
+                "r12c7": "C14S18",
+                "r13c7": "C14S19",
+                "r16c7": "C14N14",
+                "r17c7": "C14S20",
+                "r18c7": "C14S21",
+                "r19c7": "C14S22",
+                "r20c7": "C14S23",
+                "r21c7": "C14S24",
+                "r22c7": "C14S25",
+
+                  // COLUMN 8
+                  "r1c8": "C15S7",
+                "r2c8": "C15S8",
+                "r3c8": "C15S9",
+                "r4c8": "C15S10",
+                "r5c8": "C15S11",
+                "r6c8": "C15S12",
+                "r7c8": "C15S13",
+                "r8c8": "C15S14",
+                "r9c8": "C15S15",
+                "r10c8": "C15S16",
+                "r11c8": "C15S17",
+                "r12c8": "C15S18",
+                "r13c8": "C15S19",
+                "r14c8": "C15S20",
+                "r18c8": "C15N15",
+                "r19c8": "C15S21",
+                "r20c8": "C15S22",
+                "r21c8": "C15S23",
+                "r22c8": "C15S24",
+                "r23c8": "C15S25",
+
+                 // COLUMN 9
+                 "r1c9": "C16S6",
+                "r2c9": "C16S7",
+                "r3c9": "C16S8",
+                "r4c9": "C16S9",
+                "r5c9": "C16S10",
+                "r6c9": "C16S11",
+                "r7c9": "C16S12",
+                "r8c9": "C16S13",
+                "r9c9": "C16S14",
+                "r10c9": "C16S15",
+                "r11c9": "C16S16",
+                "r12c9": "C16S17",
+                "r13c9": "C16S18",
+                "r14c9": "C16S19",
+                "r15c9": "C16S20",
+                "r16c9": "C16S21",
+                "r19c9": "C16N16",
+                "r20c9": "C16N17",
+                "r21c9": "C16N18",
+                "r22c9": "C16S23",
+
+                  // COLUMN 10
+                  "r1c10": "C17S6",
+                "r2c10": "C17S7",
+                "r3c10": "C17S8",
+                "r4c10": "C17S9",
+                "r5c10": "C17S10",
+                "r6c10": "C17S11",
+                "r7c10": "C17S12",
+                "r8c10": "C17S13",
+                "r9c10": "C17S14",
+                "r10c10": "C17S15",
+                "r11c10": "C17S16",
+                "r12c10": "C17S17",
+                "r13c10": "C17S18",
+                "r14c10": "C17S19",
+                "r15c10": "C17S20",
+                "r16c10": "C17S21",
+                "r17c10": "C17S22",
+                "r18c10": "C17S23",
+                "r21c10": "C17N19",
+                "r22c10": "C17S24",
+                "r23c10": "C17S25",
+
+                  // COLUMN 11
+                  "r1c11": "C18S5",
+                "r2c11": "C18S6",
+                "r3c11": "C18S7",
+                "r4c11": "C18S8",
+                "r5c11": "C18S9",
+                "r6c11": "C18S10",
+                "r7c11": "C18S11",
+                "r8c11": "C18S12",
+                "r9c11": "C18S13",
+                "r10c11": "C18S14",
+                "r11c11": "C18S15",
+                "r12c11": "C18S16",
+                "r13c11": "C18S17",
+                "r14c11": "C18S18",
+                "r15c11": "C18S19",
+                "r16c11": "C18S20",
+                "r17c11": "C18S21",
+                "r18c11": "C18S22",
+                "r19c11": "C18S23",
+                "r20c11": "C18S24",
+
+                 // COLUMN 12
+                 "r1c12": "C19S5",
+                "r2c12": "C19S6",
+                "r3c12": "C19S7",
+                "r4c12": "C19S8",
+                "r5c12": "C19S9",
+                "r6c12": "C19S10",
+                "r7c12": "C19S11",
+                "r8c12": "C19S12",
+                "r9c12": "C19S13",
+                "r10c12": "C19S14",
+                "r11c12": "C19S15",
+                "r12c12": "C19S16",
+                "r13c12": "C19S17",
+                "r14c12": "C19S18",
+                "r15c12": "C19S19",
+                "r16c12": "C19S20",
+                "r17c12": "C19S21",
+                "r18c12": "C19S22",
+                "r19c12": "C19S23",
+                "r20c12": "C19S24",
+                "r21c12": "C19S25",
+
+                  // COLUMN 13
+                "r5c13": "C20S1",
+                "r6c13": "C20S2",
+                "r7c13": "C20S3",
+                "r8c13": "C20S4",
+                "r9c13": "C20S5",
+                "r10c13": "C20S6",
+                "r11c13": "C20S7",
+                "r12c13": "C20S8",
+                "r13c13": "C20S9",
+                "r14c13": "C20S10",
+                "r15c13": "C20S11",
+                "r16c13": "C20S12",
+                "r17c13": "C20S13",
+                "r18c13": "C20S14",
+                "r19c13": "C20S15",
+                "r20c13": "C20S16",
+                "r21c13": "C20S17",
+
+                  // COLUMN 14
+                  "r5c14": "C21S5",
+                "r6c14": "C21S6",
+                "r7c14": "C21S7",
+                "r8c14": "C21S8",
+                "r9c14": "C21S9",
+                "r10c14": "C21S10",
+                "r11c14": "C21S11",
+                "r12c14": "C21S12",
+                "r13c14": "C21S13",
+                "r14c14": "C21S14",
+                "r15c14": "C21S15",
+                "r16c14": "C21S16",
+                "r17c14": "C21S17",
+                "r18c14": "C21S18",
+                "r19c14": "C21S19",
+                "r20c14": "C21S20",
+                "r21c14": "C21S21",
+
+                // COLUMN 15
+                  "r5c15": "C22S61",
+                "r6c15": "C22S62",
+                "r7c15": "C22S63",
+                "r8c15": "C22S64",
+                "r9c15": "C22S65",
+                "r10c15": "C22S66",
+                "r11c15": "C22S67",
+                "r12c15": "C22S68",
+                "r13c15": "C22S69",
+                "r14c15": "C22S70",
+                "r15c15": "C22S71",
+                "r16c15": "C22S72",
+                "r17c15": "C22S73",
+                "r18c15": "C22S74",
+                "r19c15": "C22S75",
+                "r20c15": "C22S76",
+                "r21c15": "C22S77",
+
+                  // COLUMN 16
+                  "r5c16": "C23S63",
+                "r6c16": "C23S64",
+                "r7c16": "C23S65",
+                "r8c16": "C23S66",
+                "r9c16": "C23S67",
+                "r10c16": "C23S68",
+                "r11c16": "C23S69",
+                "r12c16": "C23S70",
+                "r13c16": "C23S71",
+                "r14c16": "C23S72",
+                "r15c16": "C23S73",
+                "r16c16": "C23S74",
+                "r17c16": "C23S75",
+                "r18c16": "C23S76",
+                "r19c16": "C23S77",
+                "r20c16": "C23S78",
+                 // COLUMN 17
+                 "r1c17": "C24S63",
+                "r2c17": "C24S64",
+                "r3c17": "C24S65",
+                "r4c17": "C24S66",
+                 "r5c17": "C24S67",
+                "r6c17": "C24S68",
+                "r7c17": "C24S69",
+                "r8c17": "C24S70",
+                "r9c17": "C24S71",
+                "r10c17": "C24S72",
+                "r11c17": "C24S73",
+                "r12c17": "C24S74",
+                "r13c17": "C24S75",
+                "r14c17": "C24S76",
+                "r15c17": "C24S77",
+                "r16c17": "C24S78",
+                "r17c17": "C24S79",
+                "r18c17": "C24S80",
+                "r19c17": "C24S81",
+
+                // COLUMN 18
+                "r1c18": "C25S63",
+                "r2c18": "C25S64",
+                "r3c18": "C25S65",
+                "r4c18": "C25S66",
+                 "r5c18": "C25S67",
+                "r6c18": "C25S68",
+                "r7c18": "C25S69",
+                "r8c18": "C25S70",
+                "r9c18": "C25S71",
+                "r10c18": "C25S72",
+                "r11c18": "C25S73",
+                "r12c18": "C25S74",
+                "r13c18": "C25S75",
+                "r14c18": "C25S76",
+                "r15c18": "C25S77",
+                "r16c18": "C25S78",
+                "r17c18": "C25S79",
+                "r18c18": "C25S80",
+                "r19c18": "C25S81",
+
+                 // COLUMN 19
+                 "r1c19": "C26S64",
+                "r2c19": "C26S65",
+                "r3c19": "C26S66",
+                "r4c19": "C26S67",
+                 "r5c19": "C26S68",
+                "r6c19": "C26S69",
+                "r7c19": "C26S70",
+                "r8c19": "C26S71",
+                "r9c19": "C26S72",
+                "r10c19": "C26S73",
+                "r11c19": "C26S74",
+                "r12c19": "C26S75",
+                "r13c19": "C26S76",
+                "r14c19": "C26S77",
+                "r15c19": "C26S78",
+                "r16c19": "C26S79",
+                "r17c19": "C26S80",
+                "r18c19": "C26S81",
+
+                
+                 // COLUMN 20
+                 "r1c20": "C27S64",
+                "r2c20": "C27S65",
+                "r3c20": "C27S66",
+                "r4c20": "C27S67",
+                 "r5c20": "C27S68",
+                "r6c20": "C27S69",
+                "r7c20": "C27S70",
+                "r8c20": "C27S71",
+                "r9c20": "C27S72",
+                "r10c20": "C27S73",
+                "r11c20": "C27S74",
+                "r12c20": "C27S75",
+                "r13c20": "C27S76",
+                "r14c20": "C27S77",
+                "r15c20": "C27S78",
+                "r16c20": "C27S79",
+                "r17c20": "C27S80",
+
+                // COLUMN 21
+                "r1c21": "C28S64",
+                "r2c21": "C28S65",
+                "r3c21": "C28S66",
+                "r4c21": "C28S67",
+                 "r5c21": "C28S68",
+                "r6c21": "C28S69",
+                "r7c21": "C28S70",
+                "r8c21": "C28S71",
+                "r9c21": "C28S72",
+                "r10c21": "C28S73",
+                "r11c21": "C28S74",
+                "r12c21": "C28S75",
+                "r13c21": "C28S76",
+                "r14c21": "C28S77",
+                "r15c21": "C28S78",
+                "r16c21": "C28S79",
+                "r17c21": "C28S80",
+
+                 // COLUMN 22
+                 "r1c22": "C29S64",
+                "r2c22": "C29S65",
+                "r3c22": "C29S66",
+                "r4c22": "C29S67",
+                 "r5c22": "C29S68",
+                "r6c22": "C29S69",
+                "r7c22": "C29S70",
+                "r8c22": "C29S71",
+                "r9c22": "C29S72",
+                "r10c22": "C29S73",
+                "r11c22": "C29S74",
+                "r12c22": "C29S75",
+                "r13c22": "C29S76",
+                "r14c22": "C29S77",
+                "r15c22": "C29S78",
+                "r16c22": "C29S79",
+
+                 // COLUMN 23
+                 "r1c23": "C30S64",
+                "r2c23": "C30S65",
+                "r3c23": "C30S66",
+                "r4c23": "C30S67",
+                 "r5c23": "C30S68",
+                "r6c23": "C30S69",
+                "r7c23": "C30S70",
+                "r8c23": "C30S71",
+                "r9c23": "C30S72",
+                "r10c23": "C30S73",
+                "r11c23": "C30S74",
+                "r12c23": "C30S75",
+                "r13c23": "C30S76",
+                "r14c23": "C30S77",
+                "r15c23": "C30S78",
+
+                  // COLUMN 24
+                  "r1c24": "C31S52",
+                "r2c24": "C31S53",
+                "r3c24": "C31S54",
+                "r4c24": "C31S55",
+                 "r5c24": "C31S56",
+                "r6c24": "C31S57",
+                "r7c24": "C31S58",
+                "r8c24": "C31S59",
+                "r9c24": "C31S60",
+                "r10c24": "C31S61",
+                "r11c24": "C31S62",
+                "r12c24": "C31S63",
+                "r13c24": "C31S64",
+                "r14c24": "C31S65",
+                "r15c24": "C31S66",
+
+                 // COLUMN 25
+                "r8c25": "C32S57",
+                "r9c25": "C32S58",
+                "r10c25": "C32S59",
+                "r11c25": "C32S60",
+                "r12c25": "C32S61",
+                "r13c25": "C32S62",
+                "r14c25": "C32S63",
+
+            };
+
+            for (let r = 1; r <= rows; r++) {
+                for (let c = 1; c <= cols; c++) {
+                  if (isExcluded(r, c)) continue; // Skip creating hotspots for excluded locations
+                    let hotspot = document.createElement("div");
+                    hotspot.classList.add("hotspot");
+                    hotspot.style.width = `${rectWidth}px`;
+                    hotspot.style.height = `${rectHeight}px`;
+
+                    // Apply offsets and gaps here
+                    let leftPosition = (c - 1) * (rectWidth + gapHorizontal) + leftOffset;
+                    let topPosition = (r - 1) * (rectHeight + gapVertical) + topOffset;
+
+                    // Set position for hotspot
+                    hotspot.style.left = `${leftPosition}px`;
+                    hotspot.style.top = `${topPosition}px`;
+
+                    let key = `r${r}c${c}`;
+                    if (hotspotMapping[key]) {
+                        hotspot.setAttribute("data-name", hotspotMapping[key]);
+                    }
+
+                    // Show tooltip on hover
+                    hotspot.onmouseenter = function (event) {
+                        if (hotspot.getAttribute("data-name")) {
+                            tooltip.innerText = hotspot.getAttribute("data-name");
+                            tooltip.style.left = `${event.pageX + 5}px`;
+                            tooltip.style.top = `${event.pageY - 20}px`;
+                            tooltip.style.visibility = "visible";
+                            tooltip.style.opacity = "1";
+                        }
+                    };
+
+                    // Move tooltip with cursor
+                    hotspot.onmousemove = function (event) {
+                        let tooltipWidth = tooltip.offsetWidth;
+                        let tooltipHeight = tooltip.offsetHeight;
+                        let x = (event.pageX + 10 + tooltipWidth > window.innerWidth) ? event.pageX - tooltipWidth - 10 : event.pageX + 10;
+                        let y = (event.pageY - tooltipHeight < 0) ? event.pageY + 20 : event.pageY - 20;
+                        tooltip.style.left = `${x}px`;
+                        tooltip.style.top = `${y}px`;
+                    };
+
+                    // Hide tooltip when cursor leaves
+                    hotspot.onmouseleave = function () {
+                        tooltip.style.visibility = "hidden";
+                        tooltip.style.opacity = "0";
+                    };
+                    hotspot.onclick = function () {
+    let hotspotName = this.getAttribute("data-name");
+
+    if (window.parent) {
+        if (this.classList.contains("selected-hotspot")) {
+            // If it's already selected, remove it
+            window.parent.removeHotspotFromDropdown(hotspotName);
+        } else {
+            // If it's newly selected, add it
+            window.parent.addHotspotToDropdown(hotspotName);
+        }
+    }
+
+    this.classList.toggle("selected-hotspot"); // Toggle selection color
+};
+
+
+                    container.appendChild(hotspot);
+                }
+            }
+        });
+        document.addEventListener("DOMContentLoaded", function () {
+    fetch("/get_submitted_hotspots")
+        .then(response => response.json())
+        .then(data => {
+            const submittedHotspots = data.submitted_hotspots;
+            
+            console.log("Fetched Submitted Hotspots:", submittedHotspots); 
+
+            // Loop through all hotspot divs in the iframe
+            document.querySelectorAll(".hotspot").forEach(hotspot => {
+                let hotspotName = hotspot.getAttribute("data-name");
+
+                if (submittedHotspots.includes(hotspotName)) {
+                     
+                    hotspot.style.border = "2px solid rgb(255, 0, 0)"; 
+                    hotspot.style.opacity = "0.8"; 
+                 
+                }
+            });
+        })
+        .catch(error => console.error("Error fetching submitted hotspots:", error));
+});
+
+    </script>
+</body>
+</html>

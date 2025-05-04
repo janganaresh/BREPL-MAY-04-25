@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+  />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+  />
+    <title>Search Remedy</title>
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        .para{
+          color: red;
+          margin-top: 10px;
+        }
+        h1 {
+            color: #4CAF50;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .form-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .search-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .search-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+        }
+
+        #dateInput {
+            width: calc(100%);
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            outline: none;
+            box-sizing: border-box;
+        }
+        #date_completed {
+            width: calc(100%);
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            outline: none;
+            box-sizing: border-box;
+        }
+        #searchButton {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #searchButton:hover {
+            background-color: #45a049;
+        }
+
+        /* Results Container */
+        #resultsContainer {
+            margin-top: 15px;
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .form-group {
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            outline: none;
+        }
+
+        .required {
+            color: red;
+            font-weight: bold;
+        }
+
+        .checkbox-container {
+            margin-bottom: 20px;
+        }
+
+        .preview-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding-top: 10px;
+
+        }
+
+        .preview {
+            align-items: center;
+            width: 150px;
+            height: 150px;
+            border: 1px solid #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background-color: #f9f9f9;
+            padding: 5PX;
+            border-radius: 5px;
+        }
+        .uploadbtn{
+            background-color: dodgerblue;
+            border-radius: 5px;
+            padding: 5px;
+            margin-top: 5px;
+            border-width: 1px;
+        }
+        .preview img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+    .assessment-container {
+    width: 100%; 
+    max-width: 600px;
+    height: 150px;
+    border: 1px solid #ccc; 
+    border-radius: 4px; 
+    background-color: #f9f9f9;
+    margin-top: 15px; 
+    display: flex; 
+    align-items: center;
+    justify-content: center;
+    text-align: center; 
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
+    padding: 10px; 
+    position: relative; 
+}
+
+/* Comment Icon */
+.comment-icon {
+    font-size: 24px; 
+    color: blue; 
+    position: absolute; 
+    bottom: 10px; 
+    right: 10px; 
+    cursor: pointer; 
+}
+.preview-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 150px;
+    text-align: center;
+    
+}
+.table-container {
+    margin-top: 15px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background: #f9f9f9;
+    width: 100%;
+    min-height: 150px;
+    display: flex;
+    flex-direction: column; 
+    gap: 10px;
+    text-align: center;
+    overflow-y: auto; 
+    max-height: 0px; 
+}
+
+.table-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 5px;
+}
+.popup {
+            display: none;
+            padding: 20px;
+            font-size: 16px;
+            border-radius: 8px;
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+        }
+
+        /* Green Popup for Success */
+        .popup.success {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        /* Red Popup for Failure */
+        .popup.failure {
+            background-color: #f44336;
+            color: white;
+        }
+        #loadingSpinner {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 45%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-top: 4px solid #078bf7;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    z-index: 1000;
+}
+
+.header {
+        background-color: #2eba41;
+        color: white;
+        padding: 10px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        z-index: 1001;
+        display: none;
+      }
+
+      .burger-button {
+        font-size: 24px;
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+      }
+
+      /* Sidebar */
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 300px;
+        height: 100%;
+        background-color: #2c3e50;
+        overflow-y: auto;
+        transition: transform 0.3s ease;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+      }
+
+      .sidebar.closed {
+        transform: translateX(-100%);
+      }
+
+      .sidebar-header {
+    background-color:  #2eba41; /* Dark blue-gray */
+    color: white;
+    padding: 14px 20px;
+    display: flex;
+    justify-content: space-between; /* Pushes elements apart */
+    align-items: center;
+}
+
+.hello-text {
+    font-size: 18px;
+    font-weight: bold;
+    background-color: #2eba41; /* Green background */
+    color: white;
+    padding: 5px 15px; /* Adds spacing */
+    border-radius: 5px; /* Rounded corners */
+    margin-right: 10px; /* Space between text and button */
+}
+
+.close-button {
+    background-color: #f44336; /* Red background */
+    color: white;
+    border: none;
+    padding: 5px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.close-button:hover {
+    background-color: darkred; /* Darker red on hover */
+}
+
+      .menu {
+        list-style: none;
+        padding: 0;
+      }
+
+      .menu-item {
+        padding: 10px 20px;
+        cursor: pointer;
+        position: relative;
+        color: white;
+        background-color: #2c3e50;
+      }
+
+      .menu-item:hover {
+        background-color: #000000;
+      }
+
+      .menu-item .arrow {
+        float: right;
+        transition: transform 0.3s;
+      }
+
+      .menu-item.open .arrow {
+        transform: rotate(90deg);
+      }
+
+      .submenu {
+        display: none;
+        list-style: none;
+        padding-left: 20px;
+        background-color: #34495e;
+       
+      }
+
+      .submenu li {
+        padding: 5px 20px;
+        color: #ecf0f1;
+      }
+
+      .submenu li:hover {
+        background-color: #000000;
+      }
+
+      .menu-item.open .submenu {
+        display: block;
+      }
+
+      /* Main Content */
+      .content {
+        align-items: center;
+        margin-left: 250px;
+        padding: 20px;
+        transition: margin-left 0.3s ease;
+      }
+
+      .sidebar.closed + .content {
+        margin-left: 0;
+      }
+      ul {
+        list-style: none;
+        padding: 0;
+      }
+
+      ul li {
+        margin: 10px 0;
+        font-size: 1.1rem;
+      }
+
+      ul li input[type="checkbox"] {
+        margin-right: 10px;
+      }
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+        /* Responsive Behavior */
+        @media (max-width: 768px) {
+            .welcome-text {
+        font-size: 1.2em; /* Same as H3 */
+    }
+        .sidebar {
+          transform: translateX(-100%);
+          width: 250px;
+        }
+        .container {
+          max-width: 100%; 
+          padding: 12px; 
+        }
+        .sidebar.open {
+          transform: translateX(0);
+        }
+
+        .content {
+          margin-left: 0;
+        }
+    }
+    </style>
+</head>
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <header class="header">
+      <span class="welcome-message">
+        <h2 class="welcome-text">😊 Welcome, {{ username }}! 🌟</h2>
+    </span>
+
+      <button id="burger-button" class="burger-button">&#9776;</button>
+    </header>
+    <div id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <span class="hello-text">Hello, {{ username }}! </span>
+        <button id="close-button" class="close-button">&times;</button>
+      </div>
+      <ul class="menu">
+        {% if user_type == 'Admin' %}
+        <li class="menu-item open" >
+          Masters <span class="arrow ">&#9654;</span>
+          <ul class="submenu">
+            <li class="menu-item" style="display: flex; justify-content: space-between; align-items: center;">
+              Customer
+              <span class="icons" style="margin-left: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+                <button class="create-btn" style="color: blue;" onclick="window.location.href='/customer'"title="Create">
+                  <i class="fas fa-plus"></i>
+                </button>
+                <button class="update-btn" onclick="window.location.href='/updatecustomer'"title="Update">
+                  <i class="fas fa-edit"></i>
+                </button>
+              </span>
+            </li>
+            
+            <li class="menu-item" style="display: flex; justify-content: space-between; align-items: center;">
+              Site
+              <span class="icons" style="margin-left: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+                <button class="create-btn" style="color: blue;" onclick="window.location.href='/site'" title="Create">
+                  <i class="fas fa-plus"></i>
+                </button>
+                <button class="update-btn" onclick="window.location.href='/updatesite'" title="Update">
+                  <i class="fas fa-edit"></i>
+                </button>
+              </span>
+            </li>
+            
+            <li class="menu-item" style="display: flex; justify-content: space-between; align-items: center;">
+              Users
+              <span class="icons" style="margin-left: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+                <button class="create-btn"style="color: blue;" onclick="window.location.href='/userform'" title="Create">
+                  <i class="fas fa-plus"></i>
+                </button>
+                <button class="update-btn" onclick="window.location.href='/updateusers'"title="Update">
+                  <i class="fas fa-edit"></i>
+                </button>
+              </span>
+            </li>
+            
+            
+          </ul>
+        </li>
+        {% endif %}
+        <li class="menu-item" style="display: flex; justify-content: space-between; align-items: center;">
+          Assessment
+          <span class="icons" style="margin-left: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+            {% if user_type=='Admin' %}
+            <button class="create-btn"style="color: blue;" onclick="window.location.href='/assessment'" title="Create">
+              <i class="fas fa-plus"></i>
+            </button>
+            {% endif %}
+            <button class="update-btn" onclick="window.location.href='/updateassmnt'"title="Update">
+              <i class="fas fa-edit"></i>
+            </button>
+         
+          </span>
+        </li>
+        
+        <li class="menu-item" style="display: flex; justify-content: space-between; align-items: center;">
+          Remedy
+          <span class="icons" style="margin-left: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+            {% if user_type=='Admin' %}
+            <button class="create-btn"style="color: blue;" onclick="window.location.href='/remedy'" title="Create">
+              <i class="fas fa-plus"></i>
+            </button>
+            {% endif %}
+            <button class="update-btn" onclick="window.location.href='/updateremedy'"title="Update">
+              <i class="fas fa-edit"></i>
+            </button>
+         
+          </span>
+        </li>
+        {% if user_type == 'Admin' %}
+        <li class="menu-item">
+          Inventory <span class="arrow">&#9654;</span>
+          <ul class="submenu">
+            <li class="menu-item" style="display: flex; justify-content: space-between; align-items: center;">
+              Inventory 
+              <span class="icons" style="margin-left: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+                <button class="create-btn"style="color: blue;" onclick="window.location.href='/inventory'" title="Create">
+                  <i class="fas fa-plus"></i>
+                </button>
+                <button class="update-btn" onclick="window.location.href='/updateinventory'"title="Update">
+                  <i class="fas fa-edit"></i>
+                </button>
+             
+              </span>
+            </li>
+            <li class="menu-item" style="display: flex; justify-content: space-between; align-items: center;">
+              Inventory Trans
+              <span class="icons" style="margin-left: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+                <button class="create-btn"style="color: blue;" onclick="window.location.href='/invtrans'" title="Create">
+                  <i class="fas fa-plus"></i>
+                </button>
+                <button class="update-btn" onclick="window.location.href='/updateinvtrans'"title="Update">
+                  <i class="fas fa-edit"></i>
+                </button>
+             
+              </span>
+            </li>
+          </ul>
+        </li>
+        
+        </li>
+        <li class="menu-item " >
+          Reports <span class="arrow ">&#9654;</span>
+          <ul class="submenu">
+            <li class="menu-item" onclick="window.location.href='/reports'" style="display: flex; justify-content: space-between; align-items: center;">
+              Assessment 
+              <i class="fas fa-chart-bar" style="margin-left: 10px;"></i>
+    
+              
+            </li>
+            <li class="menu-item" onclick="window.location.href='/remedyreports'" style="display: flex; justify-content: space-between; align-items: center;">
+              Remedy 
+              <i class="fas fa-chart-line" style="margin-left: 10px;"></i>
+    
+              
+            </li>
+            </ul>
+            </li>
+        {% endif %}
+        <li class="menu-item" onclick="window.location.href='/profile'" style="display: flex; justify-content: space-between; align-items: center;">
+          Profile
+          <i class="fas fa-user" style="margin-left: 10px;"></i>
+        </li>
+        <li class="menu-item" onclick="window.location.href='/'" style="display: flex; justify-content: space-between; align-items: center;">
+          Logout
+          <i class="fas fa-sign-out-alt" style="margin-left: 10px;"></i>
+        </li>
+      </ul>
+    </div>
+    <h1>Manage Remedy</h1>
+    <div class="search-container">
+      {% if user_type == 'Admin' %}
+      <div class="form-group">
+          <label for="user_id">Select User <span class="required"></span></label>
+          <select id="user_id" name="user_id" required>
+              <option value="" disabled selected>Select User</option>
+          </select>
+      </div>
+      {% else %}
+      <!-- Hidden field to include user_id automatically -->
+      <input type="hidden" id="user_id" name="user_id" value="{{ logged_in_user_id }}">
+      {% endif %}
+        <div class="form-group">
+            <label for="dateInput">Select  Date <span class="required"></span></label>
+            <input type="date" id="dateInput" placeholder="Select task date">
+        </div>
+        
+        <button id="searchButton">Search</button>
+
+        <div id="remedyTableContainer" class="table-container"></div>
+   
+        <div class="form-group">
+            <label for="remedy_status">Remedy Status<span class="required"></span></label>
+            <select id="remedy_status" name="remedy_status" required>
+                <option value="In Progress" selected>In Progress</option>
+                <option value="Completed">Completed</option>
+                {% if user_type == 'Admin' %}
+                <option value="PM Approved">PM Approved</option>
+                <option value="OE Approved">OE Approved</option>
+                {% endif %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="assessed_case">Assessed Case<span class="required"></span></label>
+            <select id="assessed_case" name="assessed_case" required>
+                <option value="" disabled selected>Not Assessed</option>
+                <option value="Case1">Case1</option>
+                <option value="Case2">Case2</option>
+                <option value="Case3">Case3</option>
+                <option value="Case4">Case4</option>
+            </select>
+        </div>
+        <!--<div class="form-groase
+            <label for="remedy_text">Remedy Text</label>
+            <input type="text" id="remedy_text" name="remedy_text" placeholder="Enter remedy text">
+        </div>-->
+
+        <div class="form-group">
+          <label for="date_completed">Date Completed</label>
+          <input type="date" id="date_completed" name="date_completed">
+      </div>
+    </div>
+
+    <h3>Take Pictures </h3>
+   
+    <div class="preview-container">
+        <div class="preview-item">
+          <p>Side 1</p>
+            <div class="preview" id="preview1">
+                <img src="" alt="" id="image1"> <!-- Empty source for image initially -->
+                <input type="file" accept="image/*" id="upload1" style="display:none;" accept="image/*" onchange="previewImage(event, 'preview1', 'image1', 'upload1')">
+            </div>
+            <div><button class="uploadbtn" id="uploadButton1" onclick="document.getElementById('upload1').click()">Take Picture 1</button></div>
+            <div><input type="checkbox" id="checkbox1"></div>
+        </div>
+        
+        <div class="preview-item">
+          <p>Side 2</p>
+            <div class="preview" id="preview2">
+                <img src="" alt="" id="image2"> <!-- Empty source for image initially -->
+                <input type="file" accept="image/*" id="upload2" style="display:none;" accept="image/*" onchange="previewImage(event, 'preview2', 'image2', 'upload2')">
+            </div>
+            <div><button class="uploadbtn" id="uploadButton2" onclick="document.getElementById('upload2').click()">Take Picture 2</button></div>
+            <div><input type="checkbox" id="checkbox2"></div>
+        </div>
+        
+        <div class="preview-item">
+          <p>Side 3</p>
+            <div class="preview" id="preview3">
+                <img src="" alt="" id="image3"> <!-- Empty source for image initially -->
+                <input type="file" accept="image/*" id="upload3" style="display:none;" accept="image/*" onchange="previewImage(event, 'preview3', 'image3', 'upload3')">
+            </div>
+            <div><button class="uploadbtn" id="uploadButton3" onclick="document.getElementById('upload3').click()">Take Picture 3</button></div>
+            <div><input type="checkbox" id="checkbox3"></div>
+        </div>
+        
+        <div class="preview-item">
+          <p>Side 4</p>
+            <div class="preview" id="preview4">
+                <img src="" alt="" id="image4"> <!-- Empty source for image initially -->
+                <input type="file" accept="image/*" id="upload4" style="display:none;" accept="image/*" onchange="previewImage(event, 'preview4', 'image4', 'upload4')">
+            </div>
+            <div><button class="uploadbtn" id="uploadButton4" onclick="document.getElementById('upload4').click()">Take Picture 4</button></div>
+            <div><input type="checkbox" id="checkbox4"></div>
+        </div>
+        
+    </div>
+    <p class="para">Note:- Click any check box to retake the picture</p>
+    <div class="button-container" style="margin-top: 20px;">
+        <button id="cancleButton" style="background-color: #141312; color: rgb(243, 241, 241); padding: 10px 20px;margin-right: 20px; border: none; border-radius: 4px; cursor: pointer;"  onclick="window.location.href='/dashboard'">Cancel</button>
+        <button id="retakeButton" style="background-color: #f6ad46; color: rgb(0, 0, 0); padding: 10px 20px; margin-right: 20px; border: none; border-radius: 4px; cursor: pointer;" onclick="retakePictures()">Retake</button>
+        <button id="submitButton" style="background-color: #4CAF50; color: rgb(0, 0, 0); padding: 10px 20px; margin-right: 20px; border: none; border-radius: 4px; cursor: pointer;">Save</button>
+        <div id="loadingSpinner"></div>
+    </div>
+        <div id="popupMessage" class="popup"></div>
+</body>
+
+<script>
+
+    function previewImage(event, previewId, imageId, uploadButtonId) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+            let imageElement = document.getElementById(imageId);
+            imageElement.src = e.target.result;
+            imageElement.style.display = "block"; // Ensure image is visible
+        };
+
+        reader.readAsDataURL(file);
+
+        // Hide the upload button after selecting an image
+        document.getElementById(uploadButtonId).style.display = 'none';
+    }
+}
+
+    function retakePictures() {
+    for (let i = 1; i <= 4; i++) {
+        if (document.getElementById(`checkbox${i}`).checked) {
+            let fileInput = document.getElementById(`upload${i}`);
+            let imgElement = document.getElementById(`image${i}`);
+            let uploadButton = document.getElementById(`uploadButton${i}`);
+
+            fileInput.value = ""; // Reset file input
+            imgElement.src = ""; // Clear image
+            imgElement.style.display = "none"; // Hide image
+            uploadButton.style.display = "inline-block"; // Show upload button
+
+            document.getElementById(`checkbox${i}`).checked = false; // Uncheck
+        }
+    }
+}
+
+// document.addEventListener("DOMContentLoaded", function () {
+//     const searchButton = document.getElementById("searchButton");
+//     if (!searchButton) {
+//         console.error("Error: #searchButton not found in the DOM.");
+//         return;
+//     }
+
+//     searchButton.addEventListener("click", function () {
+//         const userId = document.getElementById("user_id").value;
+//         const date = document.getElementById("dateInput").value;
+
+//         if (!userId || !date) {
+//             alert("Please select both user and date.");
+//             return;
+//         }
+
+//         fetchAssessmentDetails(userId, date);
+//     });
+// });
+
+function fetchAssessmentDetails(userId, date) {
+    fetch(`/search_by_remedydate?user_id=${encodeURIComponent(userId)}&date=${encodeURIComponent(date)}`)
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => {
+                    throw new Error(err.error || "Failed to fetch data");
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("Received Data:", data);
+
+            const container = document.getElementById("remedyTableContainer");
+            if (!container) {
+                console.error("Error: #remedyTableContainer not found.");
+                return;
+            }
+
+            if (data.data && data.data.length > 0) { // ✅ FIXED: Check 'data.data'
+                displayRemedyTableIds(data.data); // ✅ Pass the correct array
+            } else {
+                container.innerHTML = "<p>No Table IDs found.</p>";
+            }
+        })
+        .catch(error => {
+            console.error("Error fetching data:", error);
+            alert(error.message);
+        });
+}
+
+
+function displayRemedyTableIds(tableData) {
+    const container = document.getElementById("remedyTableContainer");
+    if (!container) {
+        console.error("Error: #remedyTableContainer not found.");
+        return;
+    }
+
+    container.innerHTML = ""; // Clear previous content
+
+    tableData.forEach(item => {
+        const tableId = item["Table ID"] ? item["Table ID"].trim() : "Unknown ID";
+        let remedyStatus = item["Remedy Status"] ? item["Remedy Status"].trim() : "None";
+        let assessedCase = item["Assessed Case"] ? item["Assessed Case"].trim() : "None";
+
+        
+
+        if (tableId) {
+            const div = document.createElement("div");
+            div.classList.add("table-item");
+            div.style.display = "flex";
+            div.style.alignItems = "center";
+            div.style.gap = "10px";
+
+            const radio = document.createElement("input");
+            radio.type = "radio";
+            radio.name = "remedyTableSelection";
+            radio.value = tableId;
+            radio.id = `remedy_table_${tableId}`;
+
+            const label = document.createElement("label");
+            label.htmlFor = `remedy_table_${tableId}`;
+            label.textContent = tableId;
+
+            const statusSpan = document.createElement("span");
+            statusSpan.style.marginLeft = "10px";
+            statusSpan.style.display = "inline-flex";
+            statusSpan.style.alignItems = "center";
+            statusSpan.style.lineHeight = "normal";
+
+            let tickColor = "black"; // Default color
+            if (remedyStatus === "In Progress") { 
+            tickColor = "red";  
+            } else if (remedyStatus === "Completed") {
+            tickColor = "orange"; 
+            } else if (remedyStatus === "OE Approved") {
+            tickColor = "green"; 
+            } else if (remedyStatus === "PM Approved") {
+            tickColor = "blue"; 
+            }
+
+            statusSpan.innerHTML = `<span style="color: ${tickColor}; font-size: 20px; width:30px; vertical-align: middle;">✔</span> 
+                                    <span style="margin-left: 5px; font-weight: bold;">${remedyStatus}</span>`;
+
+            div.appendChild(radio);
+            div.appendChild(label);
+            div.appendChild(statusSpan);
+
+            container.appendChild(div);
+
+            radio.addEventListener("change", function () {
+                updateRemedyDropdowns(remedyStatus, assessedCase);
+            });
+        }
+    });
+}
+
+function updateRemedyDropdowns(remedyStatus, assessedCase) {
+    const remedyStatusDropdown = document.getElementById("remedy_status");
+    const assessedCaseDropdown = document.getElementById("assess_case");
+
+    if (remedyStatusDropdown) {
+        remedyStatusDropdown.value = "";
+        let option = [...remedyStatusDropdown.options].find(opt => opt.value === remedyStatus);
+        if (option) {
+            option.selected = true;
+        }
+    }
+
+    if (assessedCaseDropdown) {
+        assessedCaseDropdown.value = "";
+        let caseOption = [...assessedCaseDropdown.options].find(opt => opt.value === assessedCase);
+        if (caseOption) {
+            caseOption.selected = true;
+        }
+    }
+
+    console.log(`Updated remedy dropdowns -> Status: ${remedyStatus}, Case: ${assessedCase}`);
+}
+
+function setDropdownValue(dropdownId, value) {
+    const dropdown = document.getElementById(dropdownId);
+    if (!dropdown) {
+        console.error(`Error: Dropdown #${dropdownId} not found.`);
+        return;
+    }
+
+    const options = dropdown.options;
+    for (let i = 0; i < options.length; i++) {
+        if (options[i].value === value) {
+            options[i].selected = true;
+            return;
+        }
+    }
+    alert(`Value "${value}" not found in the dropdown for ${dropdownId}.`);
+}
+
+function resetDropdown(dropdownId) {
+    const dropdown = document.getElementById(dropdownId);
+    if (dropdown) {
+        dropdown.selectedIndex = 0;
+    } else {
+        console.error(`Error: Dropdown #${dropdownId} not found.`);
+    }
+}
+
+const userType = "{{ user_type }}";  
+let loggedInUserId = null; // Store the normal user's ID
+
+fetch("/get_user_ids")
+    .then((response) => response.json())
+    .then((data) => {
+        console.log(data);  // Log the data to check its structure
+
+        if (data.success) {
+            const userSelect = document.getElementById("user_id");
+
+            // Clear existing options
+            userSelect.innerHTML = '';
+
+            if (userType === 'Admin') {
+                // Add a "Select User" placeholder for Admin
+                const defaultOption = document.createElement("option");
+                defaultOption.value = '';  
+                defaultOption.textContent = 'Select User';
+                defaultOption.disabled = true;
+                defaultOption.selected = true;
+                userSelect.appendChild(defaultOption);
+            }
+
+            // Check if users exist in the response
+            if (Array.isArray(data.users) && data.users.length > 0) {
+                data.users.forEach((user, index) => {
+                    const userOption = document.createElement("option");
+                    userOption.value = user.id;
+                    userOption.textContent = user.username;
+                    
+                    // If user is NOT an Admin, store the first user's ID
+                    if (userType !== 'Admin' && index === 0) {
+                        loggedInUserId = user.id;  // Store this user ID for search
+                        userOption.selected = true;
+                    }
+
+                    userSelect.appendChild(userOption);
+                });
+            } else {
+                console.error("No users found in the data.");
+            }
+        } else {
+            alert("Failed to load users: " + data.message);
+        }
+    })
+    .catch((error) => console.error("Error fetching users:", error));
+
+document.getElementById("searchButton").addEventListener("click", function () {
+    let userId;
+
+    if (userType === "Admin") {
+        userId = document.getElementById("user_id").value; // Take selected user ID
+    } else {
+        userId = loggedInUserId; // Use the first user's ID (auto-selected for normal users)
+    }
+
+    const date = document.getElementById("dateInput").value;
+
+    if (!userId || !date) {
+        alert("Please select both user and date.");
+        return;
+    }
+
+    fetchAssessmentDetails(userId, date);
+});
+document.getElementById("submitButton").addEventListener("click", function() {
+    const loadingSpinner = document.getElementById("loadingSpinner");
+    const submitButton = document.getElementById("submitButton");
+
+    const userId = document.getElementById("user_id").value;
+    const taskDate = document.getElementById("dateInput").value;
+    const remedyStatus = document.getElementById("remedy_status").value;
+    const assessedCase = document.getElementById("assessed_case").value;
+    const dateCompleted = document.getElementById("date_completed").value;  // ✅ Get "Date Completed"
+
+    // Get selected table ID (radio button)
+    const selectedTable = document.querySelector('input[name="remedyTableSelection"]:checked');
+    if (!selectedTable) {
+        alert("Please select a table ID.");
+        return;  // ❌ Prevent loader from appearing
+    }
+    const tableId = selectedTable.value;
+
+    // Get uploaded images
+    const imageFiles = [
+        document.getElementById("upload1").files[0],
+        document.getElementById("upload2").files[0],
+        document.getElementById("upload3").files[0],
+        document.getElementById("upload4").files[0]
+    ];
+
+    // Ensure all images are uploaded
+    if (imageFiles.some(file => file === undefined)) {
+        alert("Please upload all 4 pictures before submitting.");
+        return;  // ❌ Prevent loader from appearing
+    }
+
+    // ✅ If all validations pass, show loader and submit form
+    loadingSpinner.style.display = "block";
+    submitButton.disabled = true;
+
+    // Prepare FormData
+    const formData = new FormData();
+    formData.append("user_id", userId);
+    formData.append("task_date", taskDate);
+    formData.append("table_id", tableId);
+    formData.append("remedy_status", remedyStatus);
+    formData.append("assessed_case", assessedCase);
+    formData.append("date_completed", dateCompleted);  // ✅ Add "Date Completed"
+
+    // Append images
+    imageFiles.forEach((file, index) => {
+        if (file) {
+            formData.append(`image${index + 1}`, file);
+        }
+    });
+
+    // Send data to the backend
+    fetch("/update_remedy_pics", {
+        method: "POST",
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        var popupMessage = document.getElementById('popupMessage');
+        popupMessage.textContent = data.message || "Error updating the remedy. Please try again.";
+
+        if (data.success) {
+            popupMessage.classList.remove("failure");
+            popupMessage.classList.add("success");
+            clearForm();
+        } else {
+            popupMessage.classList.remove("success");
+            popupMessage.classList.add("failure");
+        }
+
+        popupMessage.style.display = "block";
+
+        setTimeout(function() {
+            popupMessage.style.display = "none";
+        }, 3000);
+    })
+    .catch(error => {
+        var popupMessage = document.getElementById('popupMessage');
+        popupMessage.classList.remove("success");
+        popupMessage.classList.add("failure");
+        popupMessage.textContent = "There was an error updating the remedy. Please try again.";
+        popupMessage.style.display = "block";
+
+        setTimeout(function() {
+            popupMessage.style.display = "none";
+        }, 3000);
+    })
+    .finally(() => {
+        loadingSpinner.style.display = "none";
+        submitButton.disabled = false;
+    });
+
+function clearForm() {
+    document.getElementById("remedy_status").value = "";
+    document.getElementById("assessed_case").value = "";
+
+    function clearImagePreview(inputId, imgId) {
+        let fileInput = document.getElementById(inputId);
+        let imgElement = document.getElementById(imgId);
+
+        fileInput.value = ""; 
+        imgElement.src = "";  
+        imgElement.style.display = "none";
+    }
+
+    clearImagePreview("upload1", "image1");
+    clearImagePreview("upload2", "image2");
+    clearImagePreview("upload3", "image3");
+    clearImagePreview("upload4", "image4");
+
+    document.getElementById("checkbox1").checked = false;
+    document.getElementById("checkbox2").checked = false;
+    document.getElementById("checkbox3").checked = false;
+    document.getElementById("checkbox4").checked = false;
+        // ✅ Mark selected table as completed (Add tick mark)
+        let selectedTable = document.querySelector(".table-container input[type='radio']:checked");
+        if (selectedTable) {
+        let label = document.querySelector(`label[for="${selectedTable.id}"]`);
+        if (label) {
+            label.style.color = "green"; // Change text color
+        }
+
+        selectedTable.checked = false; // Uncheck radio button
+
+        // Extract user ID & date from input fields
+        let userId = document.getElementById("user_id").value;
+        let date = document.getElementById("dateInput").value;
+
+        if (userId && date) {
+            fetchAssessmentDetails(userId, date); // 🔄 Refresh data after update
+        }
+    
+}
+}
+
+});
+function toggleSubMenu() {
+        const submenu = document.querySelector('.submenu');
+        const arrow = document.querySelector('.arrow');
+
+        submenu.classList.toggle('hidden');
+        arrow.classList.toggle('rotate');
+    }
+      document.addEventListener("DOMContentLoaded", () => {
+        const burgerButton = document.getElementById("burger-button");
+        const closeButton = document.getElementById("close-button");
+        const sidebar = document.getElementById("sidebar");
+
+        burgerButton.addEventListener("click", () => {
+          sidebar.classList.toggle("open");
+          sidebar.classList.toggle("closed");
+        });
+
+        closeButton.addEventListener("click", () => {
+          sidebar.classList.add("closed");
+          sidebar.classList.remove("open");
+        });
+
+        document.querySelectorAll(".menu-item").forEach((item) => {
+          item.addEventListener("click", () => {
+            item.classList.toggle("open");
+          });
+        });
+      });
+
+</script>
+</html>

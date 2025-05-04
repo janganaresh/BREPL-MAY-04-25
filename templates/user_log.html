@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <title>Responsive User Log Form</title>
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body Style */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 20px;
+        }
+
+        /* Heading */
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+
+        /* Form */
+        form {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        /* Form Group */
+        .form-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-size: 16px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 5px;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        input[type="text"], input[type="datetime-local"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            color: #555;
+            flex: 2;
+        }
+
+        input[type="text"]:focus, input[type="datetime-local"]:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+
+        /* Required Fields */
+        .required {
+            color: red;
+            font-weight: bold;
+        }
+
+        .required-text {
+            color: red;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+
+        /* Buttons (Submit and Cancel) */
+        .form-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        input[type="submit"], .cancel-btn {
+            width: 48%;
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-align: center;
+        }
+
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        .cancel-btn {
+            background-color: #f44336;
+            color: white;
+            border: none;
+        }
+
+        .cancel-btn:hover {
+            background-color: #e53935;
+        }
+        /* Centered Note */
+        .note {
+            text-align: center;
+            color: red;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        /* Responsive Behavior */
+        @media (max-width: 768px) {
+            .form-group {
+                flex-direction: column;
+            }
+
+            label {
+                margin-bottom: 5px;
+            }
+
+            input[type="text"], input[type="datetime-local"] {
+                width: 100%;
+            }
+            .form-buttons {
+    flex-direction: column;
+    gap: 10px;
+}
+
+input[type="submit"], .cancel-btn {
+    width: 100%;
+}
+        }
+    </style>
+</head>
+<body>
+    <h1>Create User Log </h1>
+    <form action="/submit_user_log_form" method="POST">
+        <div class="form-group">
+            <label for="user_id">User Name <span class="required">*</span> </label>
+            <input type="text" id="user_id" name="user_id" placeholder="Select user name" required>
+        </div>
+
+        <div class="form-group">
+            <label for="date_logged_in">Date Logged In <span class="required">*</span> </label>
+            <input type="datetime-local" id="date_logged_in" name="date_logged_in" required>
+        </div>
+
+        <div class="form-group">
+            <label for="date_logged_out">Date Logged out <span class="required">*</span> </label>
+            <input type="datetime-local" id="date_logged_out" name="date_logged_out" required>
+        </div>
+
+        <div class="form-buttons">
+            <button type="button" class="cancel-btn" onclick="window.location.href='/dashboard'">Cancel</button>
+            <input type="submit" value="Submit">
+           
+        </div>
+        <p class="note"><span class="required">*</span> Required </p>        
+    </form>
+</body>
+</html>

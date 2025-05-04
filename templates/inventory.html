@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+  />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+  />
+    <title>Item Details Form</title>
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body Style */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 20px;
+        }
+
+        /* Heading */
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+
+        /* Form */
+        form {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        /* Form Group */
+        .form-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-size: 16px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 5px;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .required {
+            color: red;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            color: #555;
+            flex: 2;
+        }
+
+        input[type="text"]:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+
+        /* Required Note */
+        .required-note {
+            color: red;
+            font-size: 14px;
+            text-align: left;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+       /* Buttons (Submit and Cancel) */
+       .form-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        input[type="submit"], .cancel-btn {
+            width: 48%;
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-align: center;
+        }
+
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        .cancel-btn {
+            background-color: #f44336;
+            color: white;
+            border: none;
+        }
+
+        .cancel-btn:hover {
+            background-color: #e53935;
+        }
+        /* Popup Message Style */
+        .popup {
+            display: none;
+            padding: 20px;
+            font-size: 16px;
+            border-radius: 8px;
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+        }
+
+        /* Green Popup for Success */
+        .popup.success {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        /* Red Popup for Failure */
+        .popup.failure {
+            background-color: #f44336;
+            color: white;
+        }
+
+        #loadingSpinner {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 45%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-top: 4px solid #0597f8;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    z-index: 1000;
+}
+
+.header {
+        background-color: #2eba41;
+        color: white;
+        padding: 10px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        z-index: 1001;
+        display: none;
+      }
+
+      .burger-button {
+        font-size: 24px;
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+      }
+
+      /* Sidebar */
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 300px;
+        height: 100%;
+        background-color: #2c3e50;
+        overflow-y: auto;
+        transition: transform 0.3s ease;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+      }
+
+      .sidebar.closed {
+        transform: translateX(-100%);
+      }
+
+      .sidebar-header {
+    background-color:  #2eba41; /* Dark blue-gray */
+    color: white;
+    padding: 14px 20px;
+    display: flex;
+    justify-content: space-between; /* Pushes elements apart */
+    align-items: center;
+}
+
+.hello-text {
+    font-size: 18px;
+    font-weight: bold;
+    background-color: #2eba41; /* Green background */
+    color: white;
+    padding: 5px 15px; /* Adds spacing */
+    border-radius: 5px; /* Rounded corners */
+    margin-right: 10px; /* Space between text and button */
+}
+
+.close-button {
+    background-color: #f44336; /* Red background */
+    color: white;
+    border: none;
+    padding: 5px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.close-button:hover {
+    background-color: darkred; /* Darker red on hover */
+}
+
+      .menu {
+        list-style: none;
+        padding: 0;
+      }
+
+      .menu-item {
+        padding: 10px 20px;
+        cursor: pointer;
+        position: relative;
+        color: white;
+        background-color: #2c3e50;
+      }
+
+      .menu-item:hover {
+        background-color: #000000;
+      }
+
+      .menu-item .arrow {
+        float: right;
+        transition: transform 0.3s;
+      }
+
+      .menu-item.open .arrow {
+        transform: rotate(90deg);
+      }
+
+      .submenu {
+        display: none;
+        list-style: none;
+        padding-left: 20px;
+        background-color: #34495e;
+       
+      }
+
+      .submenu li {
+        padding: 5px 20px;
+        color: #ecf0f1;
+      }
+
+      .submenu li:hover {
+        background-color: #000000;
+      }
+
+      .menu-item.open .submenu {
+        display: block;
+      }
+
+      /* Main Content */
+      .content {
+        align-items: center;
+        margin-left: 250px;
+        padding: 20px;
+        transition: margin-left 0.3s ease;
+      }
+
+      .sidebar.closed + .content {
+        margin-left: 0;
+      }
+      ul {
+        list-style: none;
+        padding: 0;
+      }
+
+      ul li {
+        margin: 10px 0;
+        font-size: 1.1rem;
+      }
+
+      ul li input[type="checkbox"] {
+        margin-right: 10px;
+      }
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+        /* Responsive Behavior */
+        @media (max-width: 768px) {
+            .welcome-text {
+        font-size: 1.2em; /* Same as H3 */
+    }
+        .sidebar {
+          transform: translateX(-100%);
+          width: 250px;
+        }
+        .container {
+          max-width: 100%; 
+          padding: 12px; 
+        }
+        .sidebar.open {
+          transform: translateX(0);
+        }
+
+        .content {
+          margin-left: 0;
+        }
+    }
+
+        /* Responsive Behavior */
+        @media (max-width: 768px) {
+            .form-group {
+                flex-direction: column;
+            }
+
+            label {
+                margin-bottom: 5px;
+            }
+
+            input[type="text"] {
+                width: 100%;
+            }
+            .form-buttons {
+            flex-direction: column;
+            gap: 10px;
+                }
+
+input[type="submit"], .cancel-btn {
+    width: 100%;
+}
+        }
+    </style>
+</head>
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <header class="header">
+      <span class="welcome-message">
+        <h2 class="welcome-text">😊 Welcome, {{ username }}! 🌟</h2>
+    </span>
+
+      <button id="burger-button" class="burger-button">&#9776;</button>
+    </header>
+    <div id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <span class="hello-text">Hello, {{ username }}! </span>
+        <button id="close-button" class="close-button">&times;</button>
+      </div>
+      <ul class="menu">
+        {% if user_type == 'Admin' %}
+        <li class="menu-item open" >
+          Masters <span class="arrow ">&#9654;</span>
+          <ul class="submenu">
+            <li class="menu-item" style="display: flex; justify-content: space-between; align-items: center;">
+              Customer
+              <span class="icons" style="margin-left: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+                <button class="create-btn" style="color: blue;" onclick="window.location.href='/customer'"title="Create">
+                  <i class="fas fa-plus"></i>
+                </button>
+                <button class="update-btn" onclick="window.location.href='/updatecustomer'"title="Update">
+                  <i class="fas fa-edit"></i>
+                </button>
+              </span>
+            </li>
+            
+            <li class="menu-item" style="display: flex; justify-content: space-between; align-items: center;">
+              Site
+              <span class="icons" style="margin-left: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+                <button class="create-btn" style="color: blue;" onclick="window.location.href='/site'" title="Create">
+                  <i class="fas fa-plus"></i>
+                </button>
+                <button class="update-btn" onclick="window.location.href='/updatesite'" title="Update">
+                  <i class="fas fa-edit"></i>
+                </button>
+              </span>
+            </li>
+            
+            <li class="menu-item" style="display: flex; justify-content: space-between; align-items: center;">
+              Users
+              <span class="icons" style="margin-left: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+                <button class="create-btn"style="color: blue;" onclick="window.location.href='/userform'" title="Create">
+                  <i class="fas fa-plus"></i>
+                </button>
+                <button class="update-btn" onclick="window.location.href='/updateusers'"title="Update">
+                  <i class="fas fa-edit"></i>
+                </button>
+              </span>
+            </li>
+            
+            
+          </ul>
+        </li>
+        {% endif %}
+        <li class="menu-item" style="display: flex; justify-content: space-between; align-items: center;">
+          Assessment
+          <span class="icons" style="margin-left: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+            {% if user_type=='Admin' %}
+            <button class="create-btn"style="color: blue;" onclick="window.location.href='/assessment'" title="Create">
+              <i class="fas fa-plus"></i>
+            </button>
+            {% endif %}
+            <button class="update-btn" onclick="window.location.href='/updateassmnt'"title="Update">
+              <i class="fas fa-edit"></i>
+            </button>
+         
+          </span>
+        </li>
+        
+        <li class="menu-item" style="display: flex; justify-content: space-between; align-items: center;">
+          Remedy
+          <span class="icons" style="margin-left: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+            {% if user_type=='Admin' %}
+            <button class="create-btn"style="color: blue;" onclick="window.location.href='/remedy'" title="Create">
+              <i class="fas fa-plus"></i>
+            </button>
+            {% endif %}
+            <button class="update-btn" onclick="window.location.href='/updateremedy'"title="Update">
+              <i class="fas fa-edit"></i>
+            </button>
+         
+          </span>
+        </li>
+        <li class="menu-item">
+          Inventory <span class="arrow">&#9654;</span>
+          <ul class="submenu">
+            <li class="menu-item" style="display: flex; justify-content: space-between; align-items: center;">
+              Inventory 
+              <span class="icons" style="margin-left: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+                <button class="create-btn"style="color: blue;" onclick="window.location.href='/inventory'" title="Create">
+                  <i class="fas fa-plus"></i>
+                </button>
+                <button class="update-btn" onclick="window.location.href='/updateinventory'"title="Update">
+                  <i class="fas fa-edit"></i>
+                </button>
+             
+              </span>
+            </li>
+            <li class="menu-item" style="display: flex; justify-content: space-between; align-items: center;">
+              Inventory Trans
+              <span class="icons" style="margin-left: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+                <button class="create-btn"style="color: blue;" onclick="window.location.href='/invtrans'" title="Create">
+                  <i class="fas fa-plus"></i>
+                </button>
+                <button class="update-btn" onclick="window.location.href='/updateinvtrans'"title="Update">
+                  <i class="fas fa-edit"></i>
+                </button>
+             
+              </span>
+            </li>
+          </ul>
+        </li>
+        
+        </li>
+        <li class="menu-item " >
+          Reports <span class="arrow ">&#9654;</span>
+          <ul class="submenu">
+            <li class="menu-item" onclick="window.location.href='/reports'" style="display: flex; justify-content: space-between; align-items: center;">
+              Assessment 
+              <i class="fas fa-chart-bar" style="margin-left: 10px;"></i>
+    
+              
+            </li>
+            <li class="menu-item" onclick="window.location.href='/remedyreports'" style="display: flex; justify-content: space-between; align-items: center;">
+              Remedy 
+              <i class="fas fa-chart-line" style="margin-left: 10px;"></i>
+    
+              
+            </li>
+            </ul>
+            </li>
+        
+        <li class="menu-item" onclick="window.location.href='/profile'" style="display: flex; justify-content: space-between; align-items: center;">
+          Profile
+          <i class="fas fa-user" style="margin-left: 10px;"></i>
+        </li>
+        <li class="menu-item" onclick="window.location.href='/'" style="display: flex; justify-content: space-between; align-items: center;">
+          Logout
+          <i class="fas fa-sign-out-alt" style="margin-left: 10px;"></i>
+        </li>
+      </ul>
+    </div>
+    <h1>Create Inventory  </h1>
+    <form id="inventoryForm"action="/submit_inventory_details" method="POST">
+        <div class="form-group">
+            <label for="item_type">Item Name<span class="required">*</span></label>
+            <input type="text" id="item_type" name="item_type" placeholder="Enter item name" required>
+        </div>
+
+        <div class="form-group">
+            <label for="item_uom">Item UOM<span class="required">*</span></label>
+            <input type="text" id="item_uom" name="item_uom" placeholder="Enter item UOM" required>
+        </div>
+
+        <div class="form-group">
+            <label for="item_desc">Item Description<span class="required">*</span></label>
+            <input type="text" id="item_desc" name="item_desc" placeholder="Enter item description" required>
+        </div>
+
+        <div class="form-group">
+            <label for="item_avl_qty">Item Available Quantity<span class="required">*</span></label>
+            <input type="text" id="item_avl_qty" name="item_avl_qty" placeholder="Enter available quantity" required>
+        </div>
+
+        <div class="form-group">
+            <label for="item_ror">Item ROR<span class="required">*</span></label>
+            <input type="text" id="item_ror" name="item_ror" placeholder="Enter item ROR" required>
+        </div>
+
+        <div class="form-group">
+            <label for="item_value">Item Value</label>
+            <input type="text" id="item_value" name="item_value" placeholder="Enter item value">
+        </div>
+
+        <div class="form-group">
+            <label for="item_rate">Item Rate</label>
+            <input type="text" id="item_rate" name="item_rate" placeholder="Enter item rate">
+        </div>
+
+        <div class="form-buttons">
+            <button type="button" class="cancel-btn" onclick="window.location.href='/dashboard'">Cancel</button>
+            <input type="submit" value="Submit">
+            <div id="loadingSpinner"></div>
+        </div>
+        
+        <p class="required-note">* Required </p>
+    </form>
+
+     <!-- Popup message for success or failure -->
+     <div id="popupMessage" class="popup"></div>
+-
+     <script>
+         // Handling form submission
+         document.getElementById('inventoryForm').addEventListener('submit', function(event) {
+             event.preventDefault(); // Prevent default form submission
+ 
+             var loadingSpinner = document.getElementById("loadingSpinner");
+            var submitButton = document.getElementById("submitButton");
+            if (loadingSpinner) loadingSpinner.style.display = "block"; // Show loader
+             if (submitButton) submitButton.disabled = true; // Disable button
+
+             var formData = new FormData(this);
+ 
+             // Fetch request to submit form data
+             fetch('/submit_inventory_details', {
+                 method: 'POST',
+                 body: formData
+             })
+             .then(response => response.json())
+             .then(data => {
+                 var popupMessage = document.getElementById('popupMessage');
+ 
+                 // Dynamically display server message
+                 popupMessage.textContent = data.message || 'Error submitting the form. Please try again.';
+ 
+                 if (data.success) {
+                     // Display success popup and redirect
+                     popupMessage.classList.remove('failure');
+                     popupMessage.classList.add('success');
+ 
+                     // Redirect after 3 seconds
+                     setTimeout(function() {
+                         window.location.href = 'dashboard';
+                     }, 3000);
+                 } else {
+                     // Display failure popup and stay on the page
+                     popupMessage.classList.remove('success');
+                     popupMessage.classList.add('failure');
+                 }
+ 
+                 // Show popup message
+                 popupMessage.style.display = 'block';
+ 
+                 // Hide popup after 3 seconds
+                 setTimeout(function() {
+                     popupMessage.style.display = 'none';
+                 }, 3000);
+             })
+             .catch(error => {
+                 var popupMessage = document.getElementById('popupMessage');
+                 popupMessage.classList.remove('success');
+                 popupMessage.classList.add('failure');
+                 popupMessage.textContent = 'There was an error submitting the form. Please try again.';
+                 popupMessage.style.display = 'block';
+ 
+                 // Hide popup after 3 seconds
+                 setTimeout(function() {
+                     popupMessage.style.display = 'none';
+                 }, 2000);
+             }).finally(() => {
+        if (loadingSpinner) loadingSpinner.style.display = "none"; // Hide loader
+        if (submitButton) submitButton.disabled = false; // Enable button
+    });
+         });
+         function toggleSubMenu() {
+        const submenu = document.querySelector('.submenu');
+        const arrow = document.querySelector('.arrow');
+
+        submenu.classList.toggle('hidden');
+        arrow.classList.toggle('rotate');
+    }
+      document.addEventListener("DOMContentLoaded", () => {
+        const burgerButton = document.getElementById("burger-button");
+        const closeButton = document.getElementById("close-button");
+        const sidebar = document.getElementById("sidebar");
+
+        burgerButton.addEventListener("click", () => {
+          sidebar.classList.toggle("open");
+          sidebar.classList.toggle("closed");
+        });
+
+        closeButton.addEventListener("click", () => {
+          sidebar.classList.add("closed");
+          sidebar.classList.remove("open");
+        });
+
+        document.querySelectorAll(".menu-item").forEach((item) => {
+          item.addEventListener("click", () => {
+            item.classList.toggle("open");
+          });
+        });
+      });
+     </script>
+ 
+</body>
+</html>

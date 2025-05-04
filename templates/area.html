@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <title>Responsive Area Form</title>
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body Style */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 20px;
+        }
+
+        /* Heading */
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+
+        /* Form */
+        form {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        /* Form Group */
+        .form-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-size: 16px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 5px;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        input[type="text"], input[type="date"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            color: #555;
+            flex: 2;
+        }
+
+        input[type="text"]:focus, input[type="date"]:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+
+        /* Required Fields */
+        .required {
+            color: red;
+            font-weight: bold;
+        }
+
+        /* Buttons */
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        input[type="submit"], .cancel-button {
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            flex: 1;
+        }
+
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        .cancel-button {
+            background-color: #f44336;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            line-height: 1.5;
+        }
+
+        .cancel-button:hover {
+            background-color: #f81f10;
+        }
+
+        /* Responsive Behavior */
+        @media (max-width: 768px) {
+            .form-group {
+                flex-direction: column;
+            }
+
+            label {
+                margin-bottom: 5px;
+            }
+
+            input[type="text"], input[type="date"] {
+                width: 100%;
+            }
+
+            .buttons {
+                flex-direction: column;
+            }
+        }
+
+        /* Centered Note */
+        .note {
+            text-align: center;
+            color: red;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        /* Popup Message Style */
+        .popup {
+            display: none;
+            padding: 20px;
+            font-size: 16px;
+            border-radius: 8px;
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+        }
+
+         /* Green Popup for Success */
+         .popup.success {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        /* Red Popup for Failure */
+        .popup.failure {
+            background-color: #f44336;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+  
+    <h1>Create Area </h1>
+    <form id="areaForm" action="/submit_area_form" method="POST">
+        <div class="form-group">
+            <label for="location">Area Name <span class="required">*</span></label>
+            <input type="text" id="location" name="location" placeholder="Enter Location" required>
+        </div>
+
+        <div class="form-group">
+            <label for="gps">Location <span class="required">*</span></label>
+            <input type="text" id="gps" name="gps" placeholder="Enter Coordinates/area" required>
+        </div>
+
+        <div class="buttons">
+            <a href="/dashboard" class="cancel-button">Cancel</a>
+            <input type="submit" value="Submit">
+            
+        </div>
+
+        <p class="note"><span class="required">*</span> Required </p>
+        
+    </form>
+
+    
+    <!-- Popup message for success or failure and add 3 css also -->
+    <div id="popupMessage" class="popup"></div>
+
+    <script>
+        // Handling form submission
+        document.getElementById('areaForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            // Create a FormData object to send the form data via fetch
+            var formData = new FormData(this);
+
+            // Fetch request to submit form data
+            fetch('/submit_area_form', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                var popupMessage = document.getElementById('popupMessage');
+
+                // Dynamically display server message
+                popupMessage.textContent = data.message || 'Error submitting the form. Please try again.';
+
+                if (data.success) {
+                    // Display success popup and redirect
+                    popupMessage.classList.remove('failure');
+                    popupMessage.classList.add('success');
+
+                    // Redirect after 3 seconds
+                    setTimeout(function() {
+                        window.location.href = 'dashboard';
+                    }, 3000);
+                } else {
+                    // Display failure popup and stay on the page
+                    popupMessage.classList.remove('success');
+                    popupMessage.classList.add('failure');
+                }
+
+                // Show popup message
+                popupMessage.style.display = 'block';
+
+                // Hide popup after 3 seconds
+                setTimeout(function() {
+                    popupMessage.style.display = 'none';
+                }, 3000);
+            })
+            .catch(error => {
+                var popupMessage = document.getElementById('popupMessage');
+                popupMessage.classList.remove('success');
+                popupMessage.classList.add('failure');
+                popupMessage.textContent = 'There was an error submitting the form. Please try again.';
+                popupMessage.style.display = 'block';
+
+                // Hide popup after 3 seconds
+                setTimeout(function() {
+                    popupMessage.style.display = 'none';
+                }, 2000);
+            });
+        });
+    </script>
+</body>
+</html>
